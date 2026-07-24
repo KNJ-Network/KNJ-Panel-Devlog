@@ -10,5 +10,6 @@ This repo is curated updates only — no source code. The private source repo is
 
 ## Entries
 
+- [2026-07-24 — A Real Course Correction](entries/2026-07-24-architecture-correction.md)
 - [2026-07-24 — Servers, Packages & Security Tooling](entries/2026-07-24-servers-packages-security.md)
 - [2026-07-24 — Foundations](entries/2026-07-24-foundations.md)
