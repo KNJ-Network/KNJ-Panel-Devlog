@@ -18,3 +18,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 06 - The SSL Manager, and Two More Bugs Caught Live](entries/2026-07-24-ssl-manager.md)
 - [Phase 07 - A Real Database Manager, Then an App Installer Built On Top Of It](entries/2026-07-24-database-manager-and-app-installer.md)
 - [Phase 08 - A Real Mail Server, and a Genuinely Hard Debugging Session](entries/2026-07-24-mail-provisioning.md)
+- [Phase 09 - A Real Nameserver, and the Panel's Own DNS Zone Editor](entries/2026-07-24-dns-provisioning.md)
