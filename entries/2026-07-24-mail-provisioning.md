@@ -1,4 +1,4 @@
-# A Real Mail Server, and a Genuinely Hard Debugging Session — 24 July 2026
+# Phase 08 - A Real Mail Server, and a Genuinely Hard Debugging Session
 
 M5 gave the panel real email: an account owner can create mailboxes, change their passwords, and
 set up forwarders — mail sent to one address delivered to another, which doesn't even need to be

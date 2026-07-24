@@ -1,4 +1,4 @@
-# Servers, Packages & Security Tooling — 24 July 2026
+# Phase 02 - Servers, Packages & Security Tooling
 
 Second milestone done the same day as the first — the controller (WHM-equivalent) area now
 does real work rather than just existing as a shell.

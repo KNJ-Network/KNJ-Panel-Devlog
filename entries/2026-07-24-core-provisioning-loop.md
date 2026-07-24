@@ -1,4 +1,4 @@
-# The Core Loop Actually Works — 24 July 2026
+# Phase 04 - The Core Loop Actually Works
 
 The milestone that actually proves this is a real hosting panel and not just an admin UI:
 creating an account now provisions a real, isolated hosting environment. Not a mock, not a

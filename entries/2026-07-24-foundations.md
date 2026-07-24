@@ -1,4 +1,4 @@
-# Foundations — 24 July 2026
+# Phase 01 - Foundations
 
 Starting fresh on KNJ Panel: a hosting control panel built from the ground up as a genuine
 alternative to cPanel/WHM, not a reskin of an existing tool. The goal is real feature parity

@@ -1,4 +1,4 @@
-# The SSL Manager, and Two More Bugs Caught Live — 24 July 2026
+# Phase 06 - The SSL Manager, and Two More Bugs Caught Live
 
 M3 started as "SSL automation" — issue a Let's Encrypt certificate automatically when an
 account's site goes live, no manual step. That part works, and it's been proven with a genuine

@@ -1,4 +1,4 @@
-# A Real Course Correction — 24 July 2026
+# Phase 03 - A Real Course Correction
 
 Worth being honest about this one rather than quietly editing history: earlier planning treated
 "multi-server" as generic web-hosting-node clustering — accounts distributed across an

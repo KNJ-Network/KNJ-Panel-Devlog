@@ -1,4 +1,4 @@
-# A Real Database Manager, Then an App Installer Built On Top Of It — 24 July 2026
+# Phase 07 - A Real Database Manager, Then an App Installer Built On Top Of It
 
 M4 was originally scoped as just an app installer — a one-click way to get WordPress onto a
 provisioned site, the same job Softaculous does on real cPanel. Partway into planning it, a fair
