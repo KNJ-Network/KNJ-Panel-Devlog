@@ -10,6 +10,7 @@ This repo is curated updates only — no source code. The private source repo is
 
 ## Entries
 
+- [2026-07-24 — A Real Mail Server, and a Genuinely Hard Debugging Session](entries/2026-07-24-mail-provisioning.md)
 - [2026-07-24 — A Real Database Manager, Then an App Installer Built On Top Of It](entries/2026-07-24-database-manager-and-app-installer.md)
 - [2026-07-24 — The SSL Manager, and Two More Bugs Caught Live](entries/2026-07-24-ssl-manager.md)
 - [2026-07-24 — File Manager, and a Real Vulnerability Caught Along the Way](entries/2026-07-24-file-manager-and-a-real-vulnerability.md)
