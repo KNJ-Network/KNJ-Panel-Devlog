@@ -10,6 +10,7 @@ This repo is curated updates only — no source code. The private source repo is
 
 ## Entries
 
+- [2026-07-24 — The SSL Manager, and Two More Bugs Caught Live](entries/2026-07-24-ssl-manager.md)
 - [2026-07-24 — File Manager, and a Real Vulnerability Caught Along the Way](entries/2026-07-24-file-manager-and-a-real-vulnerability.md)
 - [2026-07-24 — The Core Loop Actually Works](entries/2026-07-24-core-provisioning-loop.md)
 - [2026-07-24 — A Real Course Correction](entries/2026-07-24-architecture-correction.md)
