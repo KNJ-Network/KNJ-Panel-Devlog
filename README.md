@@ -7,3 +7,12 @@ server admins/resellers, and an account area every hosting account gets its own 
 This repo is curated updates only — no source code. The private source repo isn't public.
 
 ## Entries
+
+- [Phase 01 - Foundations](entries/2026-07-24-foundations.md)
+- [Phase 02 - Servers, Packages & Security Tooling](entries/2026-07-24-servers-packages-security.md)
+- [Phase 03 - A Real Course Correction](entries/2026-07-24-architecture-correction.md)
+- [Phase 04 - The Core Loop Actually Works](entries/2026-07-24-core-provisioning-loop.md)
+- [Phase 05 - File Manager, and a Security Issue Caught in Testing](entries/2026-07-24-file-manager-and-a-real-vulnerability.md)
+- [Phase 06 - The SSL Manager, and Two More Bugs Caught Live](entries/2026-07-24-ssl-manager.md)
+- [Phase 07 - A Real Database Manager, Then an App Installer Built On Top Of It](entries/2026-07-24-database-manager-and-app-installer.md)
+- [Phase 08 - A Real Mail Server, and a Genuinely Hard Debugging Session](entries/2026-07-24-mail-provisioning.md)
