@@ -20,3 +20,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 08 - A Real Mail Server, and a Genuinely Hard Debugging Session](entries/2026-07-24-mail-provisioning.md)
 - [Phase 09 - A Real Nameserver, and the Panel's Own DNS Zone Editor](entries/2026-07-24-dns-provisioning.md)
 - [Phase 10 - The First Full Security Audit](entries/2026-07-25-first-security-audit.md)
+- [Phase 11 - Closing Out the Audit Follow-Ups](entries/2026-07-25-closing-the-audit-follow-ups.md)
