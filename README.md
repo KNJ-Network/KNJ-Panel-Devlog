@@ -23,3 +23,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 11 - Closing Out the Audit Follow-Ups](entries/2026-07-25-closing-the-audit-follow-ups.md)
 - [Phase 12 - Filling In the Services Section](entries/2026-07-25-services-settings.md)
 - [Phase 13 - Checked Against the Real Thing](entries/2026-07-25-checked-against-the-real-thing.md)
+- [Phase 14 - A Second Server, a Real Install Script, and Multi-PHP Finally Working](entries/2026-07-25-second-server-and-multiphp.md)
+- [Phase 15 - Rethinking the Install Flow, cPanel-Style Polish, and a Second Audit](entries/2026-07-25-install-flow-and-cpanel-parity.md)
