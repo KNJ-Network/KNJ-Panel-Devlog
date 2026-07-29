@@ -32,3 +32,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 20 - A Real Webmail Client](entries/2026-07-29-real-webmail.md)
 - [Phase 21 - Choosing Your Own Password on Account Creation](entries/2026-07-29-account-password-choice.md)
 - [Phase 22 - The Webmail Choice, Built Before There's a Choice to Make](entries/2026-07-29-webmail-selector.md)
+- [Phase 23 - Our Own Webmail Client, Not Just a Reskin](entries/2026-07-29-knj-webmail.md)
