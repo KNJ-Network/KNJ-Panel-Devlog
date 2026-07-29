@@ -34,3 +34,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 22 - The Webmail Choice, Built Before There's a Choice to Make](entries/2026-07-29-webmail-selector.md)
 - [Phase 23 - Our Own Webmail Client, Not Just a Reskin](entries/2026-07-29-knj-webmail.md)
 - [Phase 24 - KNJ Webmail Starts Looking Like a Real Mail Client](entries/2026-07-29-knj-webmail-v0-2.md)
+- [Phase 25 - Your Own Folders, Filed by Dragging](entries/2026-07-29-knj-webmail-v0-3.md)
