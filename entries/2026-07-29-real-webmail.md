@@ -37,6 +37,17 @@ None of these were exotic — each one's the kind of thing that's obvious in hin
 until you actually try the real thing end to end, which is exactly why every feature in this build
 gets tested that way rather than just checked into the database.
 
+## Then proven against a real inbox, not just accepted by the mail server
+
+A first pass confirmed the mail server itself accepted a message from webmail — necessary, but not
+the same thing as proving it actually reaches someone's real inbox, since a throwaway domain that
+isn't genuinely registered anywhere publicly resolvable can never pass authentication at a real
+provider no matter how correctly the sending side behaves. So a real subdomain was properly
+delegated to this server as its own authoritative nameserver, a real account created for it through
+the actual interface, and a message sent from the real webmail login to an outside Gmail address —
+confirmed landing in the inbox via the receiving mail server's own log entry, not just the sending
+side's. Replying back was received correctly too, confirming the round trip both ways.
+
 ## Verified for real
 
 A real mailbox was created through the panel's own account-creation code, logged into through the

@@ -30,3 +30,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 18 - Ten Client-Panel Features, One Day](entries/2026-07-27-cpanel-parity-batch.md)
 - [Phase 19 - Knowing What's Running, and Keeping It Current](entries/2026-07-28-visibility-and-updates.md)
 - [Phase 20 - A Real Webmail Client](entries/2026-07-29-real-webmail.md)
+- [Phase 21 - Choosing Your Own Password on Account Creation](entries/2026-07-29-account-password-choice.md)
