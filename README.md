@@ -36,3 +36,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 24 - KNJ Webmail Starts Looking Like a Real Mail Client](entries/2026-07-29-knj-webmail-v0-2.md)
 - [Phase 25 - Your Own Folders, Filed by Dragging](entries/2026-07-29-knj-webmail-v0-3.md)
 - [Phase 26 - Rules, and a Settings Page to Hold Them](entries/2026-07-29-knj-webmail-v0-4.md)
+- [Phase 27 - Handling a Batch of Messages at Once](entries/2026-07-29-knj-webmail-v0-5.md)
