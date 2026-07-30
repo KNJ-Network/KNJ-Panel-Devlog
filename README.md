@@ -40,3 +40,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 28 - Rich Compose, and a Sanitizer That Had to Earn Its Keep](entries/2026-07-29-knj-webmail-v0-6.md)
 - [Phase 29 - Contacts, and the Original Scope Is Now Complete](entries/2026-07-29-knj-webmail-v0-7.md)
 - [Phase 30 - Track DNS, Server Settings, and Raw Log Download](entries/2026-07-29-track-dns-server-settings-raw-logs.md)
+- [Phase 31 - Resolver Config, Server Contacts, Reboot, CSR Generator, Contact Import](entries/2026-07-30-server-settings-csr-contact-import.md)
