@@ -44,3 +44,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 32 - Modify an Account, Suspend/Unsuspend, and a Real Bug Hunt](entries/2026-07-30-modify-account-suspend.md)
 - [Phase 33 - Disk Quotas That Actually Block Writes, and Bandwidth From Real Logs](entries/2026-07-30-quota-and-bandwidth.md)
 - [Phase 34 - The Second Full Security Audit](entries/2026-07-30-second-security-audit.md)
+- [Phase 35 - FTP, Built the Same Way Mail Already Was](entries/2026-07-30-ftp-accounts.md)
