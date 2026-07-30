@@ -43,3 +43,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 31 - Resolver Config, Server Contacts, Reboot, CSR Generator, Contact Import](entries/2026-07-30-server-settings-csr-contact-import.md)
 - [Phase 32 - Modify an Account, Suspend/Unsuspend, and a Real Bug Hunt](entries/2026-07-30-modify-account-suspend.md)
 - [Phase 33 - Disk Quotas That Actually Block Writes, and Bandwidth From Real Logs](entries/2026-07-30-quota-and-bandwidth.md)
+- [Phase 34 - The Second Full Security Audit](entries/2026-07-30-second-security-audit.md)
