@@ -40,3 +40,29 @@ an explicit Host header that the suspended page is what Nginx actually serves, c
 symlink points at the suspended vhost, unsuspended it, and confirmed both the symlink and the real
 site content were back exactly as they were. The in-app confirm modal was also exercised live rather
 than just reviewed.
+
+## Follow-up: branded pages, and a bug that had been silently live for days
+
+The suspended page and the default "Website Coming Soon" page shown on a freshly created domain were
+both still the bare placeholder Nginx ships with. Replaced both with branded, self-contained static
+pages — the real KNJ logo embedded as base64 so neither page depends on the panel app itself being
+reachable to serve an image.
+
+Testing them for real (rather than just locally) surfaced a genuinely bad bug. The provisioning
+script has a `case` statement gate at the top that every action's arguments get validated against
+before its actual logic runs. Turned out an inserted comment block had lost the leading `#` on two of
+its lines, and an apostrophe in one of them opened an unterminated bash single-quote — which silently
+swallowed everything after it, including the entire ~15KB embedded logo string, as one unterminated
+argument. Since that comment sits before the action-dispatch logic, this had been quietly breaking
+*every* action in the script, not just the two being worked on, since the lines landed a few commits
+earlier. `bash -n` didn't catch it — the result was still syntactically valid, just semantically
+wrong. Confirmed the fix properly this time: not just a syntax check, but actually executing the
+script's variable-declaration prefix and checking that the embedded logo string came out to the exact
+expected length with zero errors, plus a full grep of the file for any other line that could hide the
+same pattern.
+
+Live-verified on the real dev server against the exact code path that had been broken: suspended
+`test.knj.network` — a real-DNS, real-Let's-Encrypt-certificate account, the one config that exercises
+the script's SSL-cert-reuse branch for the suspended vhost — confirmed the branded suspended page
+rendered correctly over real HTTPS, unsuspended it, and confirmed the site was restored to the branded
+default page.
