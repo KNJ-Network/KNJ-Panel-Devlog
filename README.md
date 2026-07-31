@@ -45,3 +45,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 35 - FTP, Built the Same Way Mail Already Was](entries/2026-07-30-ftp-accounts.md)
 - [Phase 36 - FTP Settings, and a Sandbox Gap That Predated It](entries/2026-07-30-ftp-settings.md)
 - [Phase 37 - Backups, and Locking In a Real Path to v1.0](entries/2026-07-31-backup-engine.md)
+- [Phase 38 - Locking the Front Door: Brute-Force Protection and 2FA](entries/2026-07-31-login-security.md)
