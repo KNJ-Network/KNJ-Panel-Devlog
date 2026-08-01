@@ -50,3 +50,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 38 - Locking the Front Door: Brute-Force Protection and 2FA](entries/2026-07-31-login-security.md)
 - [Phase 39 - Cron Jobs, the Boring Way (Which Is the Right Way)](entries/2026-07-31-cron-jobs.md)
 - [Phase 40 - Licensing, and the Line It Can Never Cross](entries/2026-08-01-licensing.md)
+- [Phase 41 - The Third Full Security Audit (and the First to Cross Three Servers)](entries/2026-08-01-audit-04.md)
