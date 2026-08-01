@@ -45,3 +45,8 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 33 - Disk Quotas That Actually Block Writes, and Bandwidth From Real Logs](entries/2026-07-30-quota-and-bandwidth.md)
 - [Phase 34 - The Second Full Security Audit](entries/2026-07-30-second-security-audit.md)
 - [Phase 35 - FTP, Built the Same Way Mail Already Was](entries/2026-07-30-ftp-accounts.md)
+- [Phase 36 - FTP Settings, and a Sandbox Gap That Predated It](entries/2026-07-30-ftp-settings.md)
+- [Phase 37 - Backups, and Locking In a Real Path to v1.0](entries/2026-07-31-backup-engine.md)
+- [Phase 38 - Locking the Front Door: Brute-Force Protection and 2FA](entries/2026-07-31-login-security.md)
+- [Phase 39 - Cron Jobs, the Boring Way (Which Is the Right Way)](entries/2026-07-31-cron-jobs.md)
+- [Phase 40 - Licensing, and the Line It Can Never Cross](entries/2026-08-01-licensing.md)
