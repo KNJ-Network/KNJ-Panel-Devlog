@@ -47,3 +47,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 37 - Backups, and Locking In a Real Path to v1.0](entries/2026-07-31-backup-engine.md)
 - [Phase 38 - Locking the Front Door: Brute-Force Protection and 2FA](entries/2026-07-31-login-security.md)
 - [Phase 39 - Cron Jobs, the Boring Way (Which Is the Right Way)](entries/2026-07-31-cron-jobs.md)
+- [Phase 40 - Licensing, and Where the Line Sits](entries/2026-08-01-licensing.md)
