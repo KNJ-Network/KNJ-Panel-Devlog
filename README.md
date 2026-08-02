@@ -51,3 +51,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 41 - The Third Full Security Audit (and the First to Cross Three Servers)](entries/2026-08-01-audit-04.md)
 - [Phase 42 - The Release Pipeline, and the Three Bugs It Took to Prove It](entries/2026-08-02-release-pipeline.md)
 - [Phase 43 - My Profile Could 2FA and Nothing Else](entries/2026-08-02-my-profile.md)
+- [Phase 44 - The First Real Install, on a Server That Had Never Seen This Panel Before](entries/2026-08-02-first-real-install.md)
