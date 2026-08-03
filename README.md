@@ -51,3 +51,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 39 - Cron Jobs, the Boring Way (Which Is the Right Way)](entries/2026-07-31-cron-jobs.md)
 - [Phase 40 - Licensing, and the Line It Can Never Cross](entries/2026-08-01-licensing.md)
 - [Phase 41 - The Third Full Security Audit (and the First to Cross Three Servers)](entries/2026-08-01-audit-04.md)
+- [Phase 45 - Closing Out Service Configuration](entries/2026-08-03-service-configuration.md)
