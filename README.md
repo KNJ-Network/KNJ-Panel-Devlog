@@ -56,3 +56,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 44 - The First Real Install, on a Server That Had Never Seen This Panel Before](entries/2026-08-02-first-real-install.md)
 - [Phase 45 - The Fourth Full Security Audit (and Two Scripts That Modified Themselves)](entries/2026-08-02-audit-05.md)
 - [Phase 46 - Closing Out Service Configuration](entries/2026-08-03-service-configuration.md)
+- [Phase 47 - Finishing Accounts, and Finding Two That Were Already Done](entries/2026-08-03-accounts-section.md)
