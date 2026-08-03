@@ -1,4 +1,4 @@
-# Phase 41 - The Release Pipeline, and the Three Bugs It Took to Prove It
+# Phase 42 - The Release Pipeline, and the Three Bugs It Took to Prove It
 
 Every update mechanism this panel has shown off up to now — the version ticker, the "update
 available" banner — was checking against nothing real. There was no actual place a release could
