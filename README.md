@@ -63,3 +63,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 51 - The SSL/TLS Section, Closed Out](entries/2026-08-04-ssl-tls-section-closed.md)
 - [Phase 52 - The Databases Section, Closed Out](entries/2026-08-04-databases-section-closed.md)
 - [Phase 53 - OS Package Management, and Software & PHP Closed Out](entries/2026-08-04-os-package-management.md)
+- [Phase 54 - Packages & Resellers, Closed Out](entries/2026-08-04-packages-and-resellers-section-closed.md)
