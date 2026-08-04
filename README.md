@@ -60,3 +60,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 48 - A Firewall Bug That Only Failed Through the Real App](entries/2026-08-03-access-control-and-password-policy.md)
 - [Phase 49 - API Tokens, and the Security Section Closed](entries/2026-08-04-api-tokens-and-security-section-closed.md)
 - [Phase 50 - The Fifth Full Security Audit (and a Live Symlink Escape)](entries/2026-08-04-audit-06.md)
+- [Phase 51 - The SSL/TLS Section, Closed Out](entries/2026-08-04-ssl-tls-section-closed.md)
