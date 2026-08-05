@@ -68,3 +68,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 56 - Server Configuration, and What "Done" Actually Means Here](entries/2026-08-05-server-configuration-section.md)
 - [Phase 57 - Everything Else, and a Dead Setting Found Along the Way](entries/2026-08-05-everything-else-section.md)
 - [Phase 58 - The Admin Roadmap, Verified Against the Real Code](entries/2026-08-05-admin-roadmap-verification-audit.md)
+- [Phase 59 - The Client Email Section, and a Bug the Whole Session Kept Hiding](entries/2026-08-05-client-email-section.md)
