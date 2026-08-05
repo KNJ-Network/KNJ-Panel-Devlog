@@ -70,3 +70,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 58 - The Admin Roadmap, Verified Against the Real Code](entries/2026-08-05-admin-roadmap-verification-audit.md)
 - [Phase 59 - The Client Email Section, and a Bug the Whole Session Kept Hiding](entries/2026-08-05-client-email-section.md)
 - [Phase 60 - The Client Domains Section, and Two Bugs Older Than This Build](entries/2026-08-05-client-domains-section.md)
+- [Phase 61 - The Client Files Section, and a Roadmap Row That Was Already True](entries/2026-08-05-client-files-section.md)
