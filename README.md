@@ -75,3 +75,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 63 - The Client Metrics Section, Closed Out](entries/2026-08-05-client-metrics-section.md)
 - [Phase 64 - The Client Security Section, Closed Out](entries/2026-08-06-client-security-section.md)
 - [Phase 65 - The Client Advanced Section, Closed Out, and a Second Stale Roadmap Row](entries/2026-08-06-client-advanced-section.md)
+- [Phase 66 - Team Access, and the 44-Controller Pass That Made It Real](entries/2026-08-06-team-access.md)
