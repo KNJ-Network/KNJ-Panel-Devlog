@@ -78,3 +78,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 66 - Team Access, and the 44-Controller Pass That Made It Real](entries/2026-08-06-team-access.md)
 - [Phase 67 - Real phpMyAdmin, and Two Bugs Only a Live Server Would Show](entries/2026-08-06-phpmyadmin.md)
 - [Phase 68 - Security Audit #07, and the Escalation Path a Fix Almost Opened](entries/2026-08-06-audit-07.md)
+- [Phase 69 - The App Installer Becomes a Real Catalog, and phpBB Fights Back](entries/2026-08-07-app-installer-catalog.md)
