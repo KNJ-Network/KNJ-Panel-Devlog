@@ -77,3 +77,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 67 - Real phpMyAdmin, and Two Bugs Only a Live Server Would Show](entries/2026-08-06-phpmyadmin.md)
 - [Phase 68 - Security Audit #07, and the Escalation Path a Fix Almost Opened](entries/2026-08-06-audit-07.md)
 - [Phase 69 - The App Installer Becomes a Real Catalog, and phpBB Takes Some Work](entries/2026-08-07-app-installer-catalog.md)
+- [Phase 70 - A Roadmap That Was Stale in Both Directions, and Two Cleanup Bugs](entries/2026-08-07-audit-08-and-roadmap-sweep.md)
