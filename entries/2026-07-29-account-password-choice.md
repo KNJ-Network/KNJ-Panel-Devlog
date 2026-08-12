@@ -1,15 +1,15 @@
 # Phase 21 - Choosing Your Own Password on Account Creation
 
 A small but genuinely useful gap: Create Account has always auto-generated the owner's password
-and shown it once, which is the right default and matches real cPanel/WHM — but there was no way
-to set one explicitly instead, which matters when handing an account straight to a real client who
-wants to pick their own from the start rather than being given a random string to change later.
+and shown it once, which is the safe default — but there was no way to set one explicitly instead,
+which matters when handing an account straight to a real client who wants to pick their own from
+the start rather than being given a random string to change later.
 
 ## What shipped
 
 A toggle on account creation: auto-generate (unchanged — shown once, never stored anywhere else)
 or set a password directly, with the usual confirmation field. The username still always generates
-automatically from the domain either way, matching the existing cPanel-style convention.
+automatically from the domain either way, matching the existing convention.
 
 ## Verified against the real routes
 

@@ -1,8 +1,8 @@
 # Phase 20 - A Real Webmail Client
 
-The last open item in Email: a proper in-browser mail client. Real cPanel and WHM don't build
-their own webmail from scratch either — they bundle an existing, proven IMAP client and wire it to
-the real mail server underneath. Same approach here: a real, well-established webmail application,
+The last open item in Email: a proper in-browser mail client. The established approach for this,
+industry-wide, is bundling an existing, proven IMAP client rather than building one from scratch —
+same here: a real, well-established webmail application,
 talking to the exact same mail server every other feature in this build already uses, not a
 separate simulated one.
 

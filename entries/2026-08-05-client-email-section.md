@@ -26,8 +26,9 @@ ReadWritePaths allowlist the hard way, live, on first real use.
 Mailing Lists needed genuinely new infrastructure — its own Postfix lookup table, separate from the
 existing forwarders one, so a list address can never collide with (or silently shadow) an existing
 forwarder. Verified with a real send: one message to the list address landed in two separate
-mailboxes from a single delivery. Mail Encryption took the same shape cPanel's own S/MIME feature
-does — the panel generates and holds a self-signed certificate, the account owner downloads a
+mailboxes from a single delivery. Mail Encryption keeps the same division of responsibility a real
+S/MIME feature needs — the panel generates and holds a self-signed certificate, the account owner
+downloads a
 password-protected bundle and imports it into their own real mail client, since signing and
 decrypting mail is a mail-client feature, not a webmail-server one.
 

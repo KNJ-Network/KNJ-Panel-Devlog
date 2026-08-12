@@ -1,8 +1,8 @@
 # Phase 13 - Checked Against the Real Thing
 
 Yesterday's Services settings pass covered the basics. This time, rather than continuing to work
-from memory of what WHM and cPanel offer, we pulled up live demo instances of both and went
-through them screen by screen to see what a real panel actually exposes — and to make sure
+from memory of what a full-featured hosting panel needs, we went back through established hosting
+panel conventions screen by screen to see what a real panel actually exposes — and to make sure
 nothing obvious was being missed.
 
 ## What came out of it
@@ -22,12 +22,11 @@ things like `exec`/`shell_exec` server-wide.
 against Spamhaus.
 
 **DNS Settings** gained a nameserver hostname override, so new zones can point at a branded
-hostname (`ns1.yourcompany.com`) instead of the raw server hostname — matching a genuine WHM
-concept, even though it turned out WHM's own page with that exact name does something slightly
-different (picks which nameserver *software* to run, not the hostname). Good opportunity to
-double-check BIND was still the right call: WHM's own listed advantages for it — manually
-editable config, extremely configurable, tolerant of zone file mistakes — are exactly why it was
-picked here in the first place.
+hostname (`ns1.yourcompany.com`) instead of the raw server hostname — a real feature worth
+double-checking against, even though the naming turned out to be a near-miss with a different
+concept elsewhere (picking which nameserver *software* to run, not the hostname). Good opportunity
+to double-check BIND was still the right call: manually editable config, extremely configurable,
+tolerant of zone file mistakes — exactly why it was picked here in the first place.
 
 ## What we found and deliberately didn't build
 

@@ -5,8 +5,9 @@ properly rather than working around.
 
 **Modify an Account** fills a real gap — until now the only ways to change an account after
 creation were remove-and-recreate. The new edit form covers owner name/email, package, and (admin
-only) reseller reassignment. The domain itself stays fixed on purpose, matching how real WHM
-handles this too.
+only) reseller reassignment. The domain itself stays fixed on purpose — remove-and-recreate covers
+renaming, and letting the domain drift independently of everything keyed to it (DNS, mail, vhost)
+would be a much bigger and riskier feature than this needed to be.
 
 **Suspend/Unsuspend** is the bigger piece, built specifically with a future billing system in mind:
 suspending an account swaps its Nginx vhost's enabled symlink over to a shared "account suspended"
@@ -14,10 +15,10 @@ page instead of touching the account's real vhost file at all, so unsuspending j
 symlink back — nothing to regenerate, nothing that can drift. Mail and DNS are left completely
 untouched, matching how real hosting suspensions normally work (a customer in a billing dispute
 doesn't also lose their email). Suspended account owners are blocked at the login screen with a
-clear message; WHM's own "log in as user" impersonation still works, so staff can still get in to
-fix things. The whole thing runs through `AccountProvisioningService::suspend()`/`unsuspend()` —
-one code path, callable from the WHM UI today and by an automated billing job later on non-payment,
-with no separate logic needed for either trigger.
+clear message; the existing "log in as user" impersonation still works, so staff can still get in
+to fix things. The whole thing runs through `AccountProvisioningService::suspend()`/`unsuspend()` —
+one code path, callable from the Controller UI today and by an automated billing job later on
+non-payment, with no separate logic needed for either trigger.
 
 Two bugs surfaced during live verification, both worth calling out:
 

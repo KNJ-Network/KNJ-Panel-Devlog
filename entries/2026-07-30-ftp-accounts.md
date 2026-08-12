@@ -18,7 +18,7 @@ built to keep it consistent with the quota work from a few days ago; it just alr
 it's the same user.
 
 Every account gets one FTP login automatically the moment it's created — full access to its own
-home directory, matching cPanel's own default. A new page lets the account owner create additional
+home directory by default. A new page lets the account owner create additional
 logins scoped to just a subdirectory, for handing out upload access without handing out
 everything — jailed there by a real chroot, not just an app-level check, so there's no path out of
 it regardless of what the underlying Linux permissions would otherwise allow.

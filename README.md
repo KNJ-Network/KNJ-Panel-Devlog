@@ -1,10 +1,8 @@
 # KNJ Panel — Build Log
 
-Public progress updates for **KNJ Panel**, a custom hosting control panel built from scratch as
-a real alternative to cPanel/WHM — our own provisioning engine, not a reskin of an existing
-tool. Two layers, matching the real WHM/cPanel split: a controller (WHM-equivalent) area for
-server admins/resellers, and an account (cPanel-equivalent) area every account gets its own
-copy of.
+Public progress updates for **KNJ Panel**, a custom hosting control panel built from scratch —
+our own provisioning engine, not a reskin of an existing tool. Two layers: a Controller area for
+server admins/resellers, and an account area every hosting account gets its own copy of.
 
 This repo is curated updates only — no source code. The private source repo isn't public.
 
@@ -24,10 +22,10 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 12 - Filling In the Services Section](entries/2026-07-25-services-settings.md)
 - [Phase 13 - Checked Against the Real Thing](entries/2026-07-25-checked-against-the-real-thing.md)
 - [Phase 14 - A Second Server, a Real Install Script, and Multi-PHP Finally Working](entries/2026-07-25-second-server-and-multiphp.md)
-- [Phase 15 - Rethinking the Install Flow, cPanel-Style Polish, and a Second Audit](entries/2026-07-25-install-flow-and-cpanel-parity.md)
+- [Phase 15 - Rethinking the Install Flow, Client-Panel Polish, and a Second Audit](entries/2026-07-25-install-flow-and-client-panel-polish.md)
 - [Phase 16 - The DNS Roadmap, Closed Out](entries/2026-07-26-dns-roadmap-closed.md)
 - [Phase 17 - A Real Mail Admin Toolkit](entries/2026-07-26-mail-admin-toolkit.md)
-- [Phase 18 - Ten Client-Panel Features, One Day](entries/2026-07-27-cpanel-parity-batch.md)
+- [Phase 18 - Ten Client-Panel Features, One Day](entries/2026-07-27-client-panel-parity-batch.md)
 - [Phase 19 - Knowing What's Running, and Keeping It Current](entries/2026-07-28-visibility-and-updates.md)
 - [Phase 20 - A Real Webmail Client](entries/2026-07-29-real-webmail.md)
 - [Phase 21 - Choosing Your Own Password on Account Creation](entries/2026-07-29-account-password-choice.md)

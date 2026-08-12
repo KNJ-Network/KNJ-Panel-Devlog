@@ -34,7 +34,7 @@ timer. Wired up with a new `knjpanel-schedule.timer` running `artisan schedule:r
 standard Laravel pattern, so anything scheduled in the future just registers with the same scheduler
 instead of needing its own timer unit.
 
-WHM's List Accounts and the account-side page (renamed Disk Usage → Disk & Bandwidth, since it's not
+List Accounts and the account-side page (renamed Disk Usage → Disk & Bandwidth, since it's not
 just disk anymore) both show live usage against the package limit with a small progress bar, colored
 by how close to the limit it is.
 

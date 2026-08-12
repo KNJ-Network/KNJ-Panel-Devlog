@@ -2,11 +2,11 @@
 
 Worth being honest about this one rather than quietly editing history: earlier planning treated
 "multi-server" as generic web-hosting-node clustering — accounts distributed across an
-interchangeable pool of machines. That's not actually how cPanel/WHM works, and it's not what
-was wanted here either.
+interchangeable pool of machines. That's not actually the shape a real hosting stack needs, and
+it's not what was wanted here either.
 
-Real cPanel/WHM is a self-contained full stack on one box — web, mail, database, and DNS all
-together. The only native cross-server relationship it has is DNS clustering: a main server can
+The right model is a self-contained full stack on one box — web, mail, database, and DNS all
+together. The one genuinely useful cross-server relationship is DNS clustering: a main server can
 push its DNS out to dedicated DNS-only slave servers. That's it. No fleet of interchangeable web
 nodes.
 

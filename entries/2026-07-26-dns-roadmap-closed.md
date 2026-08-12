@@ -54,8 +54,8 @@ alongside the feature itself, not deferred.
 
 ## Email Routing, and backfilling older domains
 
-Per-domain control over whether this server or a remote system handles a domain's mail (matching
-what WHM calls Email Routing), plus a way to retroactively add SPF/DKIM/DMARC to any domain
+Per-domain control over whether this server or a remote system handles a domain's mail (Email
+Routing), plus a way to retroactively add SPF/DKIM/DMARC to any domain
 created before that automation existed — additive, so it never touches records a customer already
 has of their own.
 

@@ -1,14 +1,13 @@
 # Phase 18 - Ten Client-Panel Features, One Day
 
-A big batch day on the account (cPanel-equivalent) side, closing out most of what was left on the
-client-panel parity list in one push, plus a naming cleanup that's been overdue for a while.
+A big batch day on the account (client) side, closing out most of what was left on the
+client-panel feature list in one push, plus a naming cleanup that's been overdue for a while.
 
-## Controller / Account, not WHM / cPanel
+## Controller / Account, named as their own thing
 
-The two panel areas have been informally called "WHM" and "cPanel" internally since early on,
-since that's the real product they're modeled after — but this is its own product, not a
-whitelabel of someone else's. Every reference in the interface itself now says Controller and
-Account instead. The real logo replaced its placeholder around the same time.
+The two panel areas had been called by informal working names internally since early on — but this
+is its own product, not a whitelabel of someone else's. Every reference in the interface itself now
+says Controller and Account instead. The real logo replaced its placeholder around the same time.
 
 ## Fixed: orphaned mail storage
 

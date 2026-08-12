@@ -6,15 +6,15 @@ anything: by clicking through the finished feature against the real server rathe
 green test suite.
 
 The database browser deliberately goes further than "manage what the panel created." It lists
-every database on the box — the panel's own `knj_panel` included — because that's what a real WHM
-operator gets from phpMyAdmin, and pretending otherwise would just mean reaching for a terminal the
-moment something outside the panel's own accounts needed a look. Browsing tables and rows is the
-easy, safe half. The query runner is the deliberate one: it runs whatever SQL an admin submits,
-completely unrestricted by statement type — SELECT, INSERT, UPDATE, DELETE, DDL, all allowed. That
-sounds like a bigger risk than it is: this role already has other unrestricted root-equivalent
-actions (Server Setup, a System reboot, Panel Update's self-upgrade), so a query runner doesn't
-introduce a new trust tier, it just extends the existing one to the one remaining place a real WHM
-admin would expect it.
+every database on the box — the panel's own `knj_panel` included — because that's what a real
+database administration tool gives you, and pretending otherwise would just mean reaching for a
+terminal the moment something outside the panel's own accounts needed a look. Browsing tables and
+rows is the easy, safe half. The query runner is the deliberate one: it runs whatever SQL an admin
+submits, completely unrestricted by statement type — SELECT, INSERT, UPDATE, DELETE, DDL, all
+allowed. That sounds like a bigger risk than it is: this role already has other unrestricted
+root-equivalent actions (Server Setup, a System reboot, Panel Update's self-upgrade), so a query
+runner doesn't introduce a new trust tier, it just extends the existing one to the one remaining
+place an admin would expect it.
 
 Maintenance Tools adds a live server status view, the real MySQL process list with a per-process
 Kill button, a slow query log toggle, and one-click repair/optimize for any database — mysqlcheck

@@ -21,8 +21,8 @@ Fixed as one change. Every mutating action — retry, CSR generation, custom cer
 resolves its site from a posted `site_id`, checked against the account's own sites before anything
 runs, so one account can't reach another's certificate by guessing an ID. The page gained a bulk
 table across every domain (status, issuer, expiry) with a "Manage" link per row that switches the
-detail section below to that domain — cPanel's own SSL/TLS Status page works the same way, list then
-click to manage, so this wasn't a novel pattern to invent.
+detail section below to that domain — a familiar list-then-click-to-manage pattern, not a novel one
+to invent.
 
 Live-verified with a disposable account that actually had two domains — a primary plus a real addon
 domain added through the account's own Domains page — rather than trusting the single-site test

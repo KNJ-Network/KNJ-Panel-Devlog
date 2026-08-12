@@ -21,8 +21,7 @@ the server underneath it.
 ## System Updates
 
 A dedicated page for pending OS-level package updates, with a live terminal-style log while
-they're being applied — the same category of maintenance real WHM handles, now available without
-dropping to a shell.
+they're being applied — real server maintenance, now available without dropping to a shell.
 
 ## Also
 

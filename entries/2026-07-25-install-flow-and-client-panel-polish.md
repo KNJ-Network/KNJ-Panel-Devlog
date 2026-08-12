@@ -1,4 +1,4 @@
-# Phase 15 - Rethinking the Install Flow, cPanel-Style Polish, and a Second Audit
+# Phase 15 - Rethinking the Install Flow, Client-Panel Polish, and a Second Audit
 
 ## The install script's own blind spot
 
@@ -11,9 +11,8 @@ exist yet.
 The fix follows the same shape every mature install script uses (Proxmox, pfSense, and plenty of
 others do a version of this): install with a self-signed certificate on the bare IP, print the
 IP, ports, and a freshly generated one-time admin login at the end, and defer the real domain and
-certificate to a first-run "Server Setup" step inside the panel itself — WHM has almost exactly
-this same page under a different name. Log in with the printed credentials, set the real domain,
-and the panel issues its own certificate and switches over.
+certificate to a first-run "Server Setup" step inside the panel itself. Log in with the printed
+credentials, set the real domain, and the panel issues its own certificate and switches over.
 
 Testing this end to end surfaced one real bug: creating the very first hosting account failed
 with a 404. The cause was almost embarrassingly simple once found — a fresh install has no
@@ -31,24 +30,23 @@ resolves to a clear success or failure state — including the actual error mess
 just a red X. Small change, but it's the difference between a panel you can trust and one you
 have to double-check by re-running the same action to see if it silently worked the first time.
 
-## Closing the gap with real cPanel/WHM
+## Closing gaps in real account creation
 
 With the panel now actually usable end to end, the next pass was checking account creation
-specifically against how cPanel/WHM really behave, and closing a few gaps:
+against how established hosting panels really behave, and closing a few gaps:
 
-- **Usernames are now generated from the domain**, not manually typed — the same convention
-  cPanel uses (a short identifier derived from the domain being registered), rather than
-  whatever an operator happens to type into a name field.
+- **Usernames are now generated from the domain**, not manually typed — a short identifier
+  derived from the domain being registered, rather than whatever an operator happens to type into
+  a name field.
 - **Passwords are generated automatically** and shown exactly once, immediately after account
   creation — never stored anywhere retrievable, never shown again after leaving the page.
-- **"Log in as user"** — the button real WHM has on every row of its accounts list, that drops
-  an admin straight into that customer's own panel with no password prompt. Same behavior here
-  now, with a clear "you're logged in as X" banner and a one-click way back to the admin session.
-- The accounts list itself gained the columns a real WHM install shows and this one was missing —
-  username, contact email, server IP, and creation date.
-- The two login pages (admin/WHM-equivalent and customer/cPanel-equivalent) were previously
-  pixel-identical, which made it easy to lose track of which one you were looking at. They now
-  carry distinct badges and accent colors.
+- **"Log in as user"** — a button on every row of the accounts list that drops an admin straight
+  into that customer's own panel with no password prompt, with a clear "you're logged in as X"
+  banner and a one-click way back to the admin session.
+- The accounts list itself gained columns it was missing — username, contact email, server IP,
+  and creation date.
+- The two login pages (admin and customer) were previously pixel-identical, which made it easy to
+  lose track of which one you were looking at. They now carry distinct badges and accent colors.
 
 ## A second full security audit
 

@@ -7,7 +7,8 @@ lookup tool since earlier this session (Track DNS: hostname + record-type form, 
 +noall +answer +additional`, same hostname-validation regex), and there was no reason to invent a
 second approach for the account side. Copied the controller and view as-is into the `Account`
 namespace, no ownership check needed — it only ever queries public DNS infrastructure, nothing
-account-specific, so there's no boundary to enforce that the WHM version didn't already need either.
+account-specific, so there's no boundary to enforce that the Controller-side version didn't already
+need either.
 
 While researching what was actually left in Preferences, the same session pattern showed up again:
 the "Password & two-factor" row said self-service password change didn't have its own page yet. It

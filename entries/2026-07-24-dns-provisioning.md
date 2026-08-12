@@ -10,8 +10,8 @@ querying a domain this server has nothing to do with, and getting a flat refusal
 
 ## What it does
 
-Every new hosting account now gets a DNS zone automatically the moment it's created — the same
-sensible defaults a real WHM sets up without being asked: an NS record pointing at this server,
+Every new hosting account now gets a DNS zone automatically the moment it's created — sensible
+defaults set up without being asked: an NS record pointing at this server,
 A records for the domain and its `www`, and an MX record so mail (already running on this same
 box since the last milestone) actually knows where to go. From there, both the account owner and
 the admin side have a full zone editor — add, edit, and remove A, AAAA, CNAME, MX, TXT, NS, and
@@ -39,8 +39,8 @@ thing against the real server, not assuming a config file was correct because it
 ## What's next — and what's staying parked
 
 This milestone deliberately stopped short of DNS-only slave clustering — a second server that
-mirrors this one's DNS for redundancy, the way cPanel's own DNSONLY product works. The mechanism
-for that (standard DNS zone transfer, not anything custom) is scoped out and the panel's nav
+mirrors this one's DNS for redundancy. The mechanism for that (standard DNS zone transfer, not
+anything custom) is scoped out and the panel's nav
 already has a place reserved for it, but it's explicitly not being built yet. The core panel
 comes first; multi-server DNS clustering is a genuine add-on for after that's further along, not
 something the rest of the panel needs to wait on.

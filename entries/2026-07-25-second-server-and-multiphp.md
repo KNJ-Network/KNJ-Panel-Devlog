@@ -42,7 +42,8 @@ switch an individual account onto it. Two more pieces went in alongside it, both
 like moving between panels shouldn't require memorizing which is which:
 
 - An **account-side PHP INI Editor** — the customer-facing half of PHP configuration, separate
-  from the admin-side version manager, matching the real cPanel/WHM split.
+  from the admin-side version manager, matching the Controller/Account split already used
+  throughout this panel.
 - A **PHP module/extension manager** — toggle optional PHP extensions per version, plus one-click
   ionCube Loader installation for the (still surprisingly common) legacy commercial software that
   requires it.

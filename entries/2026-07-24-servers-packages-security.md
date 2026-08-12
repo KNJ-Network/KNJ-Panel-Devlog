@@ -1,7 +1,7 @@
 # Phase 02 - Servers, Packages & Security Tooling
 
-Second milestone done the same day as the first — the controller (WHM-equivalent) area now
-does real work rather than just existing as a shell.
+Second milestone done the same day as the first — the Controller area now does real work rather
+than just existing as a shell.
 
 ## What's working
 

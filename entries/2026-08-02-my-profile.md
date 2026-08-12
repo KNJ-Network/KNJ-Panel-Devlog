@@ -10,9 +10,9 @@ profile-information and password updates fully enabled and wired to real handler
 would have actually used them were just never built. So this shipped as two new sections on an
 existing page, backed by infrastructure that had been sitting there unused the whole time.
 
-The password field also picked up a "Generate" button, checked directly against a real WHM install
-rather than assumed: WHM's own root password tool is exactly this shape, a plain generate-or-type
-field, no forced mode either way. Click it and both password fields fill with a real random value
+The password field also picked up a "Generate" button — a plain generate-or-type field, no forced
+mode either way, the same shape account creation's own password field already uses. Click it and
+both password fields fill with a real random value
 you can see and copy before saving; ignore it and type your own instead, same as always. Verified
 by actually doing it — new email and a generated password set for real, the old login tried
 immediately after and correctly refused, the new one logging in clean.

@@ -5,8 +5,8 @@ set up forwarders — mail sent to one address delivered to another, which doesn
 a mailbox on this server. On the admin side, a default mailbox quota setting and the mail
 services showing up alongside everything else the server runs.
 
-Under the hood this is Postfix (SMTP) and Dovecot (IMAP) — the same pairing real cPanel itself
-uses — configured so both read mailbox, domain, and forwarder data directly out of the panel's
+Under the hood this is Postfix (SMTP) and Dovecot (IMAP) — a proven, widely-used pairing —
+configured so both read mailbox, domain, and forwarder data directly out of the panel's
 own database, live, through a database user that can only ever `SELECT` from exactly the three
 tables it needs. No separate mail database to keep in sync with the app; the app's own records
 are the only copy of the truth.

@@ -1,11 +1,11 @@
 # Phase 67 - Real phpMyAdmin, and Two Bugs Only a Live Server Would Show
 
 A detour from the roadmap's own order — the user wants real phpMyAdmin installed by default and
-always visible in the client panel, the same way cPanel has always had it, before we get to the
-actual Software section item (a proper multi-app installer). Not a replacement for the existing
-Database Browser (this app's own custom table/row browser, shipped earlier this session) — the
-two sit side by side, same as cPanel's own "MySQL Databases" management page next to its
-phpMyAdmin link. The real thing, not a second reimplementation of it.
+always visible in the client panel, a permanent fixture rather than something a hosting package
+can hide, before we get to the actual Software section item (a proper multi-app installer). Not a
+replacement for the existing Database Browser (this app's own custom table/row browser, shipped
+earlier this session) — the two sit side by side, a visual browser next to the real, dedicated
+tool. The real thing, not a second reimplementation of it.
 
 The interesting design question was single sign-on, not the install itself. phpMyAdmin supports
 `auth_type = signon`: point it at a session name and a fallback URL, and if that session already

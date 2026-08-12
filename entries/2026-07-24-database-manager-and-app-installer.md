@@ -1,22 +1,22 @@
 # Phase 07 - A Real Database Manager, Then an App Installer Built On Top Of It
 
 M4 was originally scoped as just an app installer — a one-click way to get WordPress onto a
-provisioned site, the same job Softaculous does on real cPanel. Partway into planning it, a fair
-question came up: the installer needs a database to work at all, so shouldn't the panel have a
-real database manager first, rather than have the installer quietly create one behind the
-scenes with nothing for the account owner to actually see or manage?
+provisioned site. Partway into planning it, a fair question came up: the installer needs a
+database to work at all, so shouldn't the panel have a real database manager first, rather than
+have the installer quietly create one behind the scenes with nothing for the account owner to
+actually see or manage?
 
 That reordered the milestone. Database manager first, app installer built directly on top of it.
 
 ## The Database Manager
 
-cPanel splits this into three ideas that work together: databases, MySQL users, and the grants
-that connect a user to a database with a specific set of privileges. A user isn't locked to one
-database, and a database can have more than one user — a read-only reporting login alongside the
-main application login, for instance. The account side of the panel now has exactly that: create
-and delete databases, create and delete database users with independent passwords, and grant
-either full access or a specific hand-picked set of privileges (the same list cPanel exposes —
-SELECT, INSERT, UPDATE, and so on) to a particular database/user pair.
+Split into three ideas that work together: databases, MySQL users, and the grants that connect a
+user to a database with a specific set of privileges. A user isn't locked to one database, and a
+database can have more than one user — a read-only reporting login alongside the main application
+login, for instance. The account side of the panel now has exactly that: create and delete
+databases, create and delete database users with independent passwords, and grant either full
+access or a specific hand-picked set of privileges (SELECT, INSERT, UPDATE, and so on) to a
+particular database/user pair.
 
 Getting there meant restructuring how the panel stored this internally — the original design
 baked exactly one database, one user, and one password into a single row, which doesn't leave

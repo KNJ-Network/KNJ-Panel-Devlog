@@ -5,10 +5,10 @@ account's site goes live, no manual step. That part works, and it's been proven 
 successful issuance against a real domain, not just a simulated one: `openssl s_client` showing
 a certificate actually signed by Let's Encrypt.
 
-But automation alone isn't what a real control panel gives an admin. cPanel and WHM both ship a
-proper SSL/TLS Manager — a place to see certificate status across every account, and a way to
-install a certificate bought elsewhere (Comodo, DigiCert, whoever), not just the free automated
-kind. So M3 grew to match that:
+But automation alone isn't what a real control panel gives an admin. A proper SSL/TLS Manager
+needs a place to see certificate status across every account, and a way to install a certificate
+bought elsewhere (Comodo, DigiCert, whoever), not just the free automated kind. So M3 grew to
+match that:
 
 - **Account side**: a status card showing the current certificate's issuer and expiry, a button
   to issue a Let's Encrypt certificate on demand, and a form to install a third-party

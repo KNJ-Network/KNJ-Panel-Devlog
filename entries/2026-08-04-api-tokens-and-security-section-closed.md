@@ -5,19 +5,19 @@ the roadmap entirely rather than staying on it as an unfinished promise — more
 
 API Tokens already had the easy half built: an admin could mint a Sanctum token and copy it. What
 it lacked was anything for that token to actually call. Before writing a single route, the question
-worth answering was what abilities a token should even have — and the answer came from looking at
-how WHMCS's own cPanel integration works, since this API doubles as the foundation a future billing
-system will automate against. WHMCS's provisioning module calls a fixed set of WHM API 1 functions
-for the account lifecycle: `createacct`, `suspendacct`, `unsuspendacct`, `removeacct`,
-`changepackage`, `passwd`. Each of those is a distinct module action in WHMCS, not one bundled
-"manage accounts" permission — which is exactly the shape this needed too. A billing integration
-token that only ever needs to suspend an account on non-payment should never also be able to
-terminate one, and the old two-ability list (`accounts:read` / `accounts:write`) had no way to make
-that distinction. It's now seven: read, create, suspend, unsuspend, terminate, package, password —
-matching WHMCS's own actions one for one.
+worth answering was what abilities a token should even have — and the answer came from thinking
+through how a billing integration would actually need to drive the account lifecycle, since this
+API doubles as the foundation a future billing system will automate against: create, suspend,
+unsuspend, remove, change package, reset password. Each of those needs to be a distinct,
+independently grantable ability, not one bundled "manage accounts" permission. A billing
+integration token that only ever needs to suspend an account on non-payment should never also be
+able to terminate one, and the old two-ability list (`accounts:read` / `accounts:write`) had no way
+to make that distinction. It's now seven: read, create, suspend, unsuspend, terminate, package,
+password — one per real lifecycle action a billing system would actually need to trigger.
 
 Building the routes those abilities gate turned into a small cleanup pass first. The account-removal
-logic and the password-reset logic both lived as private methods on the WHM `AccountController`,
+logic and the password-reset logic both lived as private methods on the Controller area's own
+`AccountController`,
 which meant the new API controller would've had to duplicate them. Both moved onto
 `AccountProvisioningService` instead, where the account-creation logic already lived from an earlier
 session — so the web form and the API now call the exact same code for every account lifecycle

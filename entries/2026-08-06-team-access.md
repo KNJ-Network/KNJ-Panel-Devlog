@@ -8,14 +8,14 @@ concept of more than one login per hosting account. Built as one feature rather 
 Three decisions got made with the user before any code: invites go out by email (an existing panel
 user accepts directly, a new person creates their own login through the invite link — never sharing
 the owner's own password); permissions are a fully custom checklist, not a coarse full/limited
-toggle, matching WHM's own `reseller_permissions` pattern already used elsewhere in this codebase;
-and — the big one — once it became clear that making collaborator access *actually work* meant
+toggle, matching the `reseller_permissions` pattern already used elsewhere in this codebase; and —
+the big one — once it became clear that making collaborator access *actually work* meant
 touching every account-side controller, the user was asked directly whether to do the full pass now
 or land the invite/accept flow first and wire up enforcement later. Full pass now, in one commit.
 
 The permission catalog is nine keys, one per account nav group (files, domains, email, databases,
-metrics, security, software, advanced, preferences) — coarser than cPanel's per-action ACLs, finer
-than a single toggle, and deliberately excludes anything that could let a collaborator manage other
+metrics, security, software, advanced, preferences) — coarser than a per-action ACL, finer than a
+single toggle, and deliberately excludes anything that could let a collaborator manage other
 collaborators. Team Access management itself stays hard owner-only: its controller resolves the
 account through its own separate `$request->user()->accounts()->firstOrFail()`, never through the
 new collaborator-aware resolver, so no permission combination can ever reach it.

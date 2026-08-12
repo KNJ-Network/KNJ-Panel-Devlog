@@ -2,13 +2,15 @@
 
 Three utility features boxed off in one session.
 
-**Track DNS** lives under the DNS section of the WHM panel, accessible to both admins and resellers.
+**Track DNS** lives under the DNS section of the Controller panel, accessible to both admins and
+resellers.
 Type a hostname, pick a record type from the dropdown (A/AAAA/MX/TXT/NS/CNAME/SOA/PTR/SRV/CAA), and
 it runs a live `dig` against the public DNS infrastructure — not the local cache — and shows the raw
 answer section. The hostname is allowlisted to letters, digits, dots, hyphens, and underscores before
 the shell call goes out.
 
-**Server Settings** is a new WHM page (admin-only, under the Servers section) with two forms on it.
+**Server Settings** is a new Controller page (admin-only, under the Servers section) with two forms
+on it.
 The top one sets the OS timezone via `timedatectl set-timezone` — full IANA timezone list in a
 dropdown. The bottom one sets the OS-level server hostname via `hostnamectl set-hostname`, and also
 reloads postfix with the new `myhostname` so mail starts identifying correctly immediately, without

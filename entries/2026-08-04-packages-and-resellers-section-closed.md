@@ -1,21 +1,21 @@
 # Phase 54 - Packages & Resellers, Closed Out
 
 Five items on this section's roadmap, one of them ("Reseller accounts") already in progress. Started
-by browsing trywhm.net's real Resellers tree directly to make sure ours covered the same ground —
-then a routing audit found something worth acting on before building anything: a Reseller's real,
-already-reachable capability surface in this codebase is exactly eight actions, not cPanel's roughly
-forty-five. Everything else in the Controller area is already either behind admin-only middleware or
-independently gated at the controller level. That narrowed "Reseller permission levels" down to
-something that actually maps onto this system, instead of building a much larger ACL that mostly
-wouldn't do anything.
+with a routing audit that found something worth acting on before building anything: a Reseller's
+real, already-reachable capability surface in this codebase is exactly eight actions, a small
+fraction of the whole Controller area. Everything else in the Controller area is already either
+behind admin-only middleware or independently gated at the controller level. That narrowed
+"Reseller permission levels" down to something that actually maps onto this system, instead of
+building a much larger ACL that mostly wouldn't do anything.
 
 Account reassignment turned out to already half-exist — a Reseller could already be reassigned
 one account at a time. The only real gap was a bulk multi-select UI, mirroring the same detached-form
 pattern List Accounts already used for bulk removal.
 
 Reseller accounts got a proper detail page (usage totals across every account they manage), plus
-something cPanel doesn't cleanly map onto: suspending a reseller's own panel login independently of
-the accounts they manage, since a reseller here isn't guaranteed to own a hosting account at all.
+a real gap this system's own shape surfaced: suspending a reseller's own panel login independently
+of the accounts they manage, since a reseller here isn't guaranteed to own a hosting account at
+all.
 
 Per-package feature control added six real, already-optional account-side capabilities — FTP, WebDAV,
 App Installer, Cron, Backups, API Tokens — as package-level toggles, enforced both server-side and in
