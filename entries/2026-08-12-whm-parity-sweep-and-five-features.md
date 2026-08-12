@@ -67,3 +67,19 @@ in this codebase since day one.
 
 All five: tested (1116/1116, full suite), linted, roadmap updated with the actual reasoning behind
 each call rather than just a checked box, `VERSION` bumped to 0.15.47-dev.
+
+## One more bug, found the same way every one before it was
+
+Live-verifying Spamd Startup Configuration through the real UI (not just the test suite) turned up
+one genuine bug: saving a nice level failed with a bare "cp: cannot create regular file
+'.../knjpanel-nice.conf.bak': Read-only file system". The exact same `ReadWritePaths`/
+`ProtectSystem=full` class of gap this codebase has hit for every single new config-writing feature
+since the original Domain Forwarding incident — php-fpm's own sandboxing didn't yet know about the
+new `/etc/systemd/system/spamd.service.d` path. Fixed the same way every prior instance was: added
+the path to the override, following the exact pattern already documented in that file's own header
+comment. Also live-verified the Database Configuration save (real restart, real file, MariaDB back
+up clean) and the Require-2FA toggle — which, turned on against this session's own non-2FA admin
+account, immediately locked that session out of everything except its own Profile page, including
+the settings page needed to turn the policy back off. That's not a bug, it's the feature actually
+requiring what it says it requires — confirmed by resetting the setting directly rather than through
+a UI the policy had just correctly locked.
