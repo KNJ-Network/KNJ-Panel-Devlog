@@ -79,3 +79,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 69 - The App Installer Becomes a Real Catalog, and phpBB Takes Some Work](entries/2026-08-07-app-installer-catalog.md)
 - [Phase 70 - A Roadmap That Was Stale in Both Directions, and Two Cleanup Bugs](entries/2026-08-07-audit-08-and-roadmap-sweep.md)
 - [Phase 71 - Five Quiet Days, Checked Properly Instead of Assumed](entries/2026-08-12-audit-09-five-quiet-days.md)
+- [Phase 72 - A Real Feature Audit, and the Feature That Said No to Itself](entries/2026-08-12-admin-feature-audit-and-five-features.md)
