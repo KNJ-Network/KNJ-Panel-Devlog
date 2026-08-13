@@ -84,3 +84,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 74 - A Search Box That Lives Where You're Already Looking](entries/2026-08-13-sidebar-feature-search.md)
 - [Phase 75 - Working Down the Gap List](entries/2026-08-13-deliverability-templates-smtp-security-questions.md)
 - [Phase 76 - A Certificate Repository Instead of a Site List](entries/2026-08-13-ssl-storage-manager.md)
+- [Phase 77 - A Feature That Wasn't There to Build](entries/2026-08-13-database-access-hosts-and-root-password-decision.md)
