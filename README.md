@@ -85,3 +85,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 75 - Working Down the Gap List](entries/2026-08-13-deliverability-templates-smtp-security-questions.md)
 - [Phase 76 - A Certificate Repository Instead of a Site List](entries/2026-08-13-ssl-storage-manager.md)
 - [Phase 77 - A Feature That Wasn't There to Build](entries/2026-08-13-database-access-hosts-and-root-password-decision.md)
+- [Phase 78 - A Feature Toggle That Actually Toggles](entries/2026-08-13-feature-manager-and-perl-modules.md)
