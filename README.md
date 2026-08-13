@@ -81,3 +81,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 71 - Five Quiet Days, Checked Properly Instead of Assumed](entries/2026-08-12-audit-09-five-quiet-days.md)
 - [Phase 72 - A Real Feature Audit, and the Feature That Said No to Itself](entries/2026-08-12-admin-feature-audit-and-five-features.md)
 - [Phase 73 - A Real Home Screen for the Account Panel](entries/2026-08-13-account-dashboard-redesign.md)
+- [Phase 74 - A Search Box That Lives Where You're Already Looking](entries/2026-08-13-sidebar-feature-search.md)
