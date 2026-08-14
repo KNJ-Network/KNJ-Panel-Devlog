@@ -88,3 +88,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 78 - A Feature Toggle That Actually Toggles](entries/2026-08-13-feature-manager-and-perl-modules.md)
 - [Phase 79 - The Feature That Cost Nothing to Build](entries/2026-08-14-server-side-cron-jobs.md)
 - [Phase 80 - The Real Thing, Not a Reimplementation](entries/2026-08-14-awstats.md)
+- [Phase 81 - Ground Truth Before a Single Line of Code](entries/2026-08-14-upgrade-database-version.md)
