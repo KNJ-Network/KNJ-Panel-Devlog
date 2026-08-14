@@ -34,13 +34,34 @@ same pattern already established for package installs and system updates — exc
 under the queue worker's own unrestricted process, not the web server's sandboxed one, since writing
 a new apt repository file lands outside what that sandbox is allowed to touch.
 
-## What shipped, and what deliberately didn't run yet
+## What shipped
 
 Only real, currently-supported LTS releases are ever offered as a target — never a rolling or
-release-candidate build, never a version already installed or older. The code is built, tested, and
-deployed to the dev server. What hasn't happened yet is triggering a real upgrade against that
-server's own live database — every other feature built this session depends on that database staying
-healthy, so that one step waits for an explicit go-ahead rather than being assumed.
+release-candidate build, never a version already installed or older. Deployed and tested against the
+dev server's own render of the page — but the one thing deliberately not risked on it was triggering
+a real upgrade against a database every other feature this session depends on staying healthy.
+
+## The disposable box did exactly its job
+
+Rather than test the real thing against the dev server, a fresh release was cut and installed on this
+project's own disposable test box instead — a real, standalone install with nothing to lose. First
+real run found a genuine bug: this panel's own database usually lives in the very MariaDB instance a
+snapshot or upgrade briefly stops. A live-log write landing in that exact window threw an uncaught
+exception that took the whole queue worker down with it — and because the job was deliberately
+configured to never auto-retry (retrying a half-finished server upgrade automatically is its own kind
+of dangerous), Laravel just gave up on it, leaving the run stuck at "Running" forever with no real
+work ever done.
+
+No actual damage — dpkg was clean, MariaDB was untouched, nothing was left half-installed. The fix
+was small: that log write is now best-effort, so a connection hiccup during the brief outage just
+means the log looks momentarily stale, never a dead job. Cut a second release with the fix, upgraded
+the test box again through its own real self-update mechanism, and ran the whole thing again from
+scratch: a real snapshot, a real `10.11.14 → 11.4.12` upgrade, and a real restore back from that
+snapshot — all three genuine, all three clean, the queue worker never crashed once on the second
+pass. Restoring a snapshot turned out to roll back the whole panel database to that exact moment, not
+just the schema — expected once you think about where the data actually lives, and already exactly
+what the confirm-modal's own warning says, just satisfying to see confirmed for real rather than
+assumed.
 
 ## Next
 
