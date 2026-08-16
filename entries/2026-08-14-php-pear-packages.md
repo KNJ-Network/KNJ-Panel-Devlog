@@ -31,6 +31,21 @@ in a real way, not just a smaller diff.
 own Software group — same self-service, no-admin-needed shape Perl Modules shipped with a day
 earlier. That closes out the Client Panel's whole Software section.
 
+## A latent bug, sitting under every apt-based feature this whole time
+
+Live-testing the actual Install button surfaced something bigger than a PEAR-specific bug: a bare
+`Read-only file system` from dpkg, on a package that had genuinely never been installed on this
+server before. The real cause — installing any brand-new package makes dpkg create fresh files
+under `/usr/share/doc/<package>/` and `/usr/share/php/`, both locked read-only by php-fpm's own
+`ProtectSystem=full` sandbox. Every apt-based feature already in this panel (Perl Modules, PHP
+extensions, OS Package Manager) shares the exact same exposure — it simply never got hit before,
+because every package those features were ever tested against had already been pulled onto the
+server by something else first. A manual SSH test of the identical command never reproduces this
+either: SSH sessions aren't inside php-fpm's mount namespace at all, so only a real click through
+the UI ever exercises the restriction. Fixed by unlocking both paths; re-verified live afterward
+with a package this server had never touched, watched it install cleanly end to end through the
+real button.
+
 ## Next
 
 Continuing down the gap list.
