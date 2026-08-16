@@ -93,3 +93,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 83 - Eight Packages, Verified One at a Time](entries/2026-08-14-php-pear-packages.md)
 - [Phase 84 - The Smallest Gap on the List](entries/2026-08-14-backup-user-selection.md)
 - [Phase 85 - The Update Mechanism Updates Everything, Except the Part That Updates It](entries/2026-08-16-self-update-sandbox-fixes.md)
+- [Phase 86 - Restoring the One File, Not the Whole Account](entries/2026-08-16-file-and-directory-restoration.md)
