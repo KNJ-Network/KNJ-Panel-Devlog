@@ -91,3 +91,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 81 - Ground Truth Before a Single Line of Code](entries/2026-08-14-upgrade-database-version.md)
 - [Phase 82 - The Same Door, Reachable From Both Sides](entries/2026-08-14-self-service-perl-modules.md)
 - [Phase 83 - Eight Packages, Verified One at a Time](entries/2026-08-14-php-pear-packages.md)
+- [Phase 84 - The Smallest Gap on the List](entries/2026-08-14-backup-user-selection.md)
