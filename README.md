@@ -97,3 +97,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 87 - Closing the Loop on the Package-Install Fix](entries/2026-08-16-php-extension-toggle-async.md)
 - [Phase 88 - BoxTrapper Actually Releases Your Mail](entries/2026-08-16-boxtrapper-release-and-auto-whitelist.md)
 - [Phase 89 - Restoring a Real cPanel Account, Not a Reimplementation of Our Own](entries/2026-08-17-restore-a-cpanel-account.md)
+- [Phase 90 - Restoring a cPanel Backup Into an Account You Already Have](entries/2026-08-17-restore-from-cpanel-backup-client-panel.md)
