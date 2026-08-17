@@ -104,3 +104,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 94 - Fix Everything, Then Audit It](entries/2026-08-17-audit-11-pre-release-security-pass.md)
 - [Phase 95 - Finishing What Audit #11 Left Open](entries/2026-08-17-drupal-password-fix-and-nextcloud-removal.md)
 - [Phase 96 - Two Small Ones: User Manager and the Postfix Config Gap](entries/2026-08-17-exim-configuration-manager-parity.md)
+- [Phase 97 - Return to Admin, and Making 0.15.99 Real](entries/2026-08-17-return-to-admin-fix-and-a-real-release-cut.md)
