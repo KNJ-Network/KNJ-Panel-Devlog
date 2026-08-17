@@ -102,3 +102,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 92 - Transfer Tool](entries/2026-08-17-transfer-tool.md)
 - [Phase 93 - Convert Addon Domain to Account](entries/2026-08-17-convert-addon-domain-to-account.md)
 - [Phase 94 - Fix Everything, Then Audit It](entries/2026-08-17-audit-11-pre-release-security-pass.md)
+- [Phase 95 - Finishing What Audit #11 Left Open](entries/2026-08-17-drupal-password-fix-and-nextcloud-removal.md)
