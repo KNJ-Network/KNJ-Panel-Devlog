@@ -86,4 +86,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 76 - A Certificate Repository Instead of a Site List](entries/2026-08-13-ssl-storage-manager.md)
 - [Phase 77 - A Feature That Wasn't There to Build](entries/2026-08-13-database-access-hosts-and-root-password-decision.md)
 - [Phase 99 - DNS-Only Server Role](entries/2026-08-18-dns-only-server-role.md)
-- [Phase 100 - Install Script Sudo Fixes, and a Login Bug They Uncovered](entries/2026-08-19-install-script-sudo-fixes.md)
+- [Phase 100 - Install Script Sudo Fixes, a Login Bug They Uncovered, and a Licence That Shouldn't Exist](entries/2026-08-19-install-script-sudo-fixes.md)

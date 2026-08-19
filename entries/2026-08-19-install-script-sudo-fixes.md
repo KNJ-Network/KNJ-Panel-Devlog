@@ -1,4 +1,4 @@
-# Phase 100 - Install Script Sudo Fixes, and a Login Bug They Uncovered
+# Phase 100 - Install Script Sudo Fixes, a Login Bug They Uncovered, and a Licence That Shouldn't Exist
 
 The user ran `bootstrap-server.sh` on a genuinely fresh, disposable VM for the first time since
 Phase 98's setup wizard shipped — the real test that wizard was built for. It surfaced three
@@ -48,18 +48,28 @@ from before the panel was ever installed, since that also restores the old `mach
 unchanged and the trial simply continues rather than resetting. Confirmed live: two installs in a
 row on a restored-from-snapshot box returned the identical trial key and expiry both times.
 
-## A login bug this uncovered
+## A login bug this uncovered — and a fix that looked right but wasn't
 
 Working install in hand, the very next login attempt landed on raw JSON (the dashboard's own
 polling endpoint) instead of the dashboard page. Root cause, once traced: the header bar's
-background stats poll (`server-stats-bar.blade.php`) fetches its own JSON endpoint every 8 seconds
-without declaring `Accept: application/json`. If that poll ever fires unauthenticated — a stale
-browser tab still open against a box that's since been wiped and reinstalled, for instance —
-Laravel's auth middleware treats it as an ordinary page visit: 302 to `/login`, and silently
-stashes that JSON URL as the post-login redirect target. The very next real login then lands there
-instead of the dashboard. Fixed by declaring the header explicitly (so an unauthenticated hit gets
-a clean 401 with nothing stored) and by having the poll stop itself once it sees one, rather than
-continuing to hammer a session that's gone.
+background stats poll (`server-stats-bar.blade.php`) fetches its own JSON endpoint every 8 seconds.
+If that poll ever fires unauthenticated — a stale browser tab still open against a box that's since
+been wiped and reinstalled, for instance — Laravel's auth middleware treats it as an ordinary page
+visit: 302 to `/login`, and silently stashes that JSON URL as the post-login redirect target. The
+very next real login then lands there instead of the dashboard.
+
+First fix (shipped as v0.16.12): declare `Accept: application/json` on the poll's fetch, so
+Laravel's own `expectsJson()` would see it and return a clean 401 instead of redirecting. Read as
+correct, tests passed, shipped. It did nothing. Caught only by testing the actual live behavior
+with `curl` against the real deployed box rather than trusting the code read: the response was
+still a 302, still setting a fresh session cookie. `bootstrap/app.php` has its own
+`shouldRenderJsonWhen(fn ($request) => $request->is('api/*'))` — which doesn't *add to* Laravel's
+default JSON-detection rule, it *replaces* it. For any route outside `/api/*`, the Accept header is
+never even consulted. Real fix (v0.16.13): `$request->is('api/*') || $request->expectsJson()`,
+restoring the framework default alongside the existing api-only guarantee. Verified the same way
+the first "fix" should have been: `curl -H "Accept: application/json"` against the endpoint,
+unauthenticated, and confirmed a genuine `401 {"message":"Unauthenticated."}` with no `Location`
+header this time.
 
 ## Checked the rest of the install/update surface for the same shape
 
@@ -88,17 +98,44 @@ actually-broken service. Added a genuine third state — "Not set up yet," with 
 Server Setup — driven off whether `panel.hostname` is configured, not just whether the systemd unit
 happens to be running.
 
+## DNS-only was never supposed to hold a licence — but still could
+
+The install script already skips the trial request for `dns_only` role, gated correctly, with a
+comment saying exactly why: no accounts, nothing to sell or meter, exempt outright. But that only
+covers the install-time call. The hourly `knjpanel:validate-license` schedule had no role check at
+all — it runs unconditionally on every install, and its logic is simply "no licence.key set? try
+requesting a trial." Every DNS-only box has no `licence.key` at install time, by design, so within
+an hour of any DNS-only install finishing, this scheduled backstop quietly gave it a trial anyway.
+That's exactly how `knj-dnstest-server` ended up holding one. `LicenceController`'s three actions
+(`show`/`activate`/`retryTrial`) had the same gap from the other side: the `/licence` route sits
+outside `DnsOnlyRoleGate`'s allowlist entirely (it's not under the `controller.` name-group the
+gate polices), so it stayed fully reachable, and none of the three checked role either. Fixed both:
+`ValidateLicense` now returns immediately for `dns_only`, before ever touching `hasLicence()`, and
+all three `LicenceController` actions 404 for that role — there's genuinely nothing here for it to
+do, not just nothing enforced.
+
+Found while double-checking exactly what the live licence server's `licenses` table actually held,
+box by box, before deleting anything from it — six rows turned out to be stale test data with no
+current box holding their key at all (confirmed against each of the three real boxes' own currently
+active `licence.key`, not just IP/timestamp guessing), and this DNS-only gap was one of the reasons
+one of them existed in the first place.
+
 ## Verified
 
-Full suite (1,484 tests) and `pint --test` pass. Live: two clean installs in a row on a
-snapshot-restored VM, setup wizard through to login working both times, trial licence correctly
-continued rather than duplicated. The `knjpanel-upgrade` fix and the login-redirect fix are queued
-for their own live upgrade test on `knj-test-server` next, since that box was already outdated and
-makes a real, non-synthetic test target.
+Full suite (1,489 tests, after the DNS-only licensing fix added five) and `pint --test` pass.
+Live, for real, on three separate boxes:
+
+- Two clean installs in a row on a snapshot-restored disposable VM (`knj-test2`) — setup wizard
+  through to login both times, trial licence correctly continued rather than duplicated.
+- `knj-test-server` upgraded from v0.15.66 straight to v0.16.14 via its own `knjpanel-upgrade` —
+  the exact self-update path a real customer's "Update Now" button runs. Confirmed via `curl` that
+  the login-redirect fix actually holds post-upgrade.
+- `knj-dnstest-server` upgraded to v0.16.14 and its stale local `licence.*` settings cleared —
+  confirmed the hourly validate-license command now no-ops for it with no HTTP call at all.
 
 ## Next
 
-Live-verify this release's `knjpanel-upgrade` fix by actually upgrading `knj-test-server`, then
-decide whether `DOMAIN` should become mandatory at install time — the original "domain can't point
+Decide whether `DOMAIN` should become mandatory at install time — the original "domain can't point
 at a server that doesn't exist yet" reasoning doesn't actually hold, since the server (and its IP)
-exists before the panel software is ever installed on it.
+exists before the panel software is ever installed on it. The exhaustive page-by-page audit against
+real cPanel's DNS Only WHM is still outstanding too, unrelated to anything in this phase.
