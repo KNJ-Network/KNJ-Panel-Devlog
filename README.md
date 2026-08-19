@@ -106,3 +106,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 96 - Two Small Ones: User Manager and the Postfix Config Gap](entries/2026-08-17-exim-configuration-manager-parity.md)
 - [Phase 97 - Return to Admin, and Making 0.15.99 Real](entries/2026-08-17-return-to-admin-fix-and-a-real-release-cut.md)
 - [Phase 98 - First-Run Setup Wizard](entries/2026-08-18-first-run-setup-wizard.md)
+- [Phase 99 - DNS-Only Server Role](entries/2026-08-18-dns-only-server-role.md)
+- [Phase 100 - Install Script Fixes, a Login Bug They Uncovered, and a Licence Gap](entries/2026-08-19-install-script-sudo-fixes.md)
