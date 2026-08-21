@@ -39,6 +39,14 @@ authenticated, no credentials typed anywhere. Redeeming the exact same URL a sec
 real 403 Forbidden — single-use replay protection holds outside the test suite too, not just inside
 it.
 
+This is genuinely role-agnostic, not a mail-only feature that happens to be named after the mail-only
+stage it shipped alongside — the same code path covers any linked satellite. Confirmed by also
+upgrading the linked `knj-dnstest-server` (DNS Only, a big jump straight from v0.16.24 to v0.16.38
+since that box hadn't been touched since Stage 1) and repeating the exact same sequence: minted URL,
+fresh redemption landed on its real DNS Only dashboard (DNS Replication/Server Link nav visible,
+confirming it's genuinely that role's own UI and not a generic fallback), then the second redemption
+attempt also correctly came back 403.
+
 ## Stage 3 and Stage 4, both done
 
 This closes out everything tracked under Mail Only in this session: Stage 1 (linking), Stage 2
