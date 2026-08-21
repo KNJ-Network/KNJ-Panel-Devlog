@@ -8,7 +8,7 @@ redoing — a box pointed at the wrong Main server, or reinstalled, had nowhere 
 starting point for a wider pass: go back through the DNS-only role and close out what was still
 genuinely missing, checked directly against a real cPanel DNSOnly install rather than assumed.
 
-## One page instead of two
+## From two pages, to one, to two again — the right two
 
 DNS-only server linking used to be two separate screens: a first-run setup page that generated a
 Link Key and redirected away the moment linking completed, and a second, permanently read-only
@@ -16,9 +16,14 @@ status page for afterward. The setup screen becoming unreachable once linked was
 the underlying linking service already supported re-linking cleanly (`updateOrCreate` under the
 hood), the gap was purely that the UI never gave you a way back to it.
 
-Both screens are now one: `DnsReplicationController` renders a single "DNS Replication" page that
-shows the zone status table plus a collapsible re-link form once linked, or the paste-a-Link-Key
-form directly when not. Same page, no dead ends.
+The first fix merged both into one page. That closed the dead end, but broke something else:
+labeled "DNS Replication," it read as "go here to resync zones," not "go here to manage the link"
+— even though managing the link was the whole point. Splitting it back into two, purpose-named
+pages fixed that without reopening the original hole: **Server Link** (under the sidebar's Server
+group) owns the linking status and the paste-a-Link-Key/collapsible-re-link form; **DNS
+Replication** (its own DNS group) owns the read-only zone table. Both independently show the same
+"linked to X" summary, since knowing which Main a box is pointed at is useful context on either
+page, not just one.
 
 ## Hostname drift, fixed in both directions
 
@@ -49,13 +54,21 @@ configured yet, Main's own story. On DNS-only those three are never installed at
 not. Fixed by dropping them from the list entirely on this role, rather than showing a state that
 can never resolve itself.
 
-## A manual sync button
+## A manual sync button, reachable from both sides
 
 The 15-minute `knjpanel:sync-dns-only-servers` sweep is the real safety net, but waiting up to 15
 minutes to confirm a freshly-added zone or a hostname fix actually landed is genuinely annoying
-during normal admin work. Main's own Manage Servers edit page now has a "Sync now" button next to
-Test Connection for any linked DNS-only server, which just dispatches the existing
-`PushZoneMembershipJob` on demand instead of waiting for the next scheduled run.
+during normal admin work. Main's own Manage Servers edit page got a "Sync now" button next to Test
+Connection for any linked DNS-only server, dispatching the existing `PushZoneMembershipJob` on
+demand.
+
+A DNS-only box's own DNS Replication page got a matching button — but that side can't dispatch
+Main's job directly, so it needed a real round trip: a new Main-side endpoint
+(`DnsSyncRequestController`) that a linked satellite can call to ask for a push right now,
+authenticated the same way the existing push endpoint already authenticates in the opposite
+direction — the satellite's own secret from linking, which Main only ever stored a hash of. Same
+two-key trust relationship the whole linking system already runs on, just exercised in the
+direction that hadn't been built yet.
 
 ## One planned item, dropped after checking it against reality
 
@@ -69,10 +82,17 @@ never applies. Dropped rather than shipped for the sake of shipping something.
 
 ## Verified for real, not just tested
 
-Every piece here went out as a real release (v0.16.22, v0.16.23) and was installed on
-`knj-dnstest-server` via its own `knjpanel-upgrade` before being called done — the merged
-Replication page confirmed showing its real linked state (status card, zone table, collapsible
-re-link form), the sidebar's DNS Only pill confirmed stacking correctly above the version pill, and
-all seven newly-exposed pages confirmed rendering cleanly with the trimmed six-service list, not
-just passing against a database that had never seen the old scheme or the old service list in the
-first place.
+Every piece here went out as a real release (v0.16.22 through v0.16.24) and was installed on
+`knj-dnstest-server` via its own `knjpanel-upgrade` before being called done — the sidebar's DNS
+Only pill confirmed stacking correctly above the version pill, all seven newly-exposed pages
+confirmed rendering cleanly with the trimmed six-service list, and the final split Server Link/DNS
+Replication pages confirmed both rendering correctly with matching "linked to" summaries.
+
+Live testing the new bidirectional Sync Now button caught a real bug the local test suite missed
+entirely: the new Main-side endpoint 419'd on every real request, because it wasn't added to the
+CSRF-exemption list the three sibling internal endpoints (the existing zone-membership push, the
+Git deploy webhook, and one other) already needed for the same reason — a caller with no session
+can't carry a CSRF token, so an unguessable secret in the URL is the actual authentication boundary
+for all of them. `php artisan test` never caught it; only a real HTTPS request between two real
+boxes did. Fixed, redeployed, and reconfirmed — clicking "Sync now" on the DNS-only side now
+genuinely reaches Main and updates "last sync received" within seconds.
