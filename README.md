@@ -114,3 +114,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 104 - Mail Only, Stage 1: Linking, Role Gate, Bootstrap](entries/2026-08-21-mail-only-stage-1.md)
 - [Phase 105 - Mail Only, Stage 2: The Dispatcher, and a Real Selector](entries/2026-08-21-mail-only-stage-2.md)
 - [Phase 106 - Mail Only: Syncing Existing Accounts to a New Mail Server](entries/2026-08-21-mail-only-account-sync.md)
+- [Phase 107 - A Webmail Login Bug With Two Separate Causes](entries/2026-08-21-mail-login-bug-and-impersonation-isolation.md)
