@@ -88,3 +88,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 99 - DNS-Only Server Role](entries/2026-08-18-dns-only-server-role.md)
 - [Phase 100 - Install Script Sudo Fixes, a Login Bug They Uncovered, and a Licence That Shouldn't Exist](entries/2026-08-19-install-script-sudo-fixes.md)
 - [Phase 101 - Deploy from Git Rebuild, and a Real Subdomains Feature to Build It On](entries/2026-08-19-deploy-from-git-rebuild.md)
+- [Phase 102 - Two-Key Server Linking, Replacing the Shared Token](entries/2026-08-21-two-key-server-linking.md)
