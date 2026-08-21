@@ -90,3 +90,7 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 101 - Deploy from Git Rebuild, and a Real Subdomains Feature to Build It On](entries/2026-08-19-deploy-from-git-rebuild.md)
 - [Phase 102 - Two-Key Server Linking, Replacing the Shared Token](entries/2026-08-21-two-key-server-linking.md)
 - [Phase 103 - Closing Out DNS-Only Feature Parity](entries/2026-08-21-dns-only-feature-parity.md)
+- [Phase 104 - Mail Only, Stage 1: Linking, Role Gate, Bootstrap](entries/2026-08-21-mail-only-stage-1.md)
+- [Phase 105 - Mail Only, Stage 2: The Dispatcher, and a Real Selector](entries/2026-08-21-mail-only-stage-2.md)
+- [Phase 106 - Mail Only: Syncing Existing Accounts to a New Mail Server](entries/2026-08-21-mail-only-account-sync.md)
+- [Phase 107 - A Webmail Login Bug With Two Separate Causes, and a Session That Leaked Sideways](entries/2026-08-21-mail-login-bug-and-impersonation-isolation.md)
