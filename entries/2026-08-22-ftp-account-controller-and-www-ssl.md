@@ -98,4 +98,7 @@ Shipped as v0.16.48, then live-verified against the real server:
 
 Deployed to all three servers (`panel.dev.knj.network`, `mail.dev.knj.network`,
 `knj-dnstest-server`) via the standard cut-release → sync → Update Now cycle; all three confirmed on
-v0.16.49.
+v0.16.49. Re-ran `issueSsl()` for `test.knj.network` one more time post-fix:
+`openssl x509 -ext subjectAltName` now reads `DNS:test.knj.network, DNS:www.test.knj.network`, and
+`https://www.test.knj.network` serves that certificate with no mismatch. Feature and fix both
+confirmed genuinely working end to end, not just "script exited 0."
