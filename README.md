@@ -125,3 +125,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 115 - Audit #14: A Secret Worth More Than It Should Have Been](entries/2026-08-22-audit-14.md)
 - [Phase 116 - Line-By-Line Bug Sweep: Correctness, Not Security](entries/2026-08-22-bug-sweep.md)
 - [Phase 117 - DNS-only comparison audit](entries/2026-08-22-dnsonly-comparison-audit.md)
+- [Phase 118 - webmail.domain and domain.com/webmail](entries/2026-08-22-webmail-dns-shortcut.md)
