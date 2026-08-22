@@ -59,3 +59,43 @@ provisioning script. New coverage: `DnsZoneServiceTest` (webmail record on creat
 `NginxSettingsTest` (the redirect line appears with a hostname set, is omitted without one), and
 `ServerSetupTest` (issuing the panel cert also fires `nginx-settings-write`, proving the redirect
 target actually gets regenerated).
+
+## Two more bugs found live, fixed same day
+
+Deploying to panel-dev and re-issuing its panel cert (the trigger for both the `/webmail` redirect
+and the `webmail.*` catch-all to actually reach an already-existing install) surfaced two pre-existing
+bugs in `issue-panel-cert`, neither caused by this change but both blocking it from reaching a live
+install cleanly:
+
+1. **certbot's own "not yet due for renewal" exits 1**, not 0 — a benign no-op, not a real failure,
+   but indistinguishable from one by exit code alone under this script's `set -e`. Silently aborted
+   the entire action before ever reaching the vhost rewrite, any time it ran against a hostname whose
+   cert was already valid. Fixed by checking the actual output text for that specific message before
+   deciding whether to fail.
+2. **`grep '^PANEL_ROLE=' .env | cut ...` finding nothing aborts under `set -o pipefail`** — the
+   `${PANEL_INSTALL_ROLE:-main}` fallback on the very next line never got a chance to apply, because
+   the failed command substitution itself triggered `set -e` first. panel-dev's own `.env` genuinely
+   has no `PANEL_ROLE=` line (an older install, predating that convention) — a real, live instance of
+   exactly this gap. Fixed with `|| true` on the grep.
+
+Both were reachable pre-existing bugs (not something today's change introduced), just never triggered
+before — certbot had never previously needed to run against an already-valid cert on a `.env` missing
+`PANEL_ROLE`, until this exact deploy needed to. Shipped as v0.16.46 and v0.16.47.
+
+## End-to-end, against real production
+
+With both fixes live, re-ran `IssuePanelCertJob` on panel-dev for real — `panel.dev.knj.network`,
+already valid, not due for renewal. Confirmed the actual generated files:
+`/etc/nginx/snippets/knjpanel-global.conf` has the `/webmail` redirect line;
+`/etc/nginx/sites-available/knjpanel` has the `webmail.*` regex catch-all block. Then, against the
+one real customer domain on this install (`test.knj.network`):
+
+- `curl -I https://test.knj.network/webmail` → real 301 to `https://panel.dev.knj.network:2083/webmail`.
+- `curl --resolve webmail.test.knj.network:80:<server-ip> http://webmail.test.knj.network/` → real 301
+  to the same target, proving the catch-all vhost fires correctly for a name no real vhost claims.
+- Following the full redirect chain (`curl -L`) lands on `.../webmail/login` with a real `200`.
+- `test.knj.network`'s zone predates this feature and had no `webmail` record — confirmed missing,
+  then backfilled for real via `restoreDefaultRecords()` (the same "Restore Default Records" action
+  admins use), and confirmed present in both the DB and the actual live BIND zone file
+  (`/etc/bind/zones/db.test.knj.network`). `dig @127.0.0.1 webmail.test.knj.network A` resolves to the
+  server's real IP.
