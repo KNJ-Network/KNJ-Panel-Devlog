@@ -49,3 +49,28 @@ exception; 2 `DnsZoneService` — SRV records backfilled by `restoreDefaultRecor
 `dns.template_include_mail_srv` toggle actually stopping them from being written) plus SRV assertions
 added to the existing new-zone-creation test, and `ProvisionAccountJobTest`'s DNS record count updated
 (12 → 14). Full suite 1,735 (up from 1,731), `pint --test` green.
+
+## Live-verify addendum (same day) — found a real, pre-existing DNS bug
+
+Shipped as v0.16.52, then live-verified against `test.knj.network`: backfilled the SRV records,
+synced the autoconfig XML, and pulled both back with real DNS queries and a real HTTPS request.
+
+The autoconfig XML was correct on the first try — real hostname, real ports, both paths serving 200.
+The SRV records were not: `dig SRV _imaps._tcp.test.knj.network` returned
+`mail.dev.knj.network.test.knj.network.` instead of `mail.dev.knj.network.` — the mail server's own
+domain, with the customer's zone silently appended to the end.
+
+Root cause, found by reading the raw zone file BIND actually wrote: `DnsZoneService::recordLine()`
+absolutizes (adds the trailing dot) CNAME/MX/NS targets before writing them, so BIND treats them as
+fully-qualified — but SRV was never included in that list, so its target was written bare. Per DNS
+syntax, a name with no trailing dot is relative to the zone's own `$ORIGIN`; BIND correctly (per spec)
+appended `test.knj.network` to a target that was never supposed to be relative in the first place.
+
+This bug predates this feature entirely — any SRV record ever manually added through the Zone Manager
+UI with an external target has always had it. It just took the panel generating its own SRV records
+for the first time, pointing at a genuinely different domain (the mail server's hostname, essentially
+always not the same as the customer's own domain), to actually exercise the broken path and surface
+it. Fixed with a new `absolutizeSrvTarget()` that splits SRV's `weight port target` value and
+absolutizes only the trailing target field, mirroring the same `absolute()` helper CNAME/MX/NS already
+use. New regression test (`test_exported_zone_file_absolutizes_srv_targets`) covers a cross-domain
+target directly. Shipped as v0.16.53.
