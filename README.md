@@ -133,3 +133,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 123 - Per-mailbox quota and suspension](entries/2026-08-22-mailbox-quota-and-suspension.md)
 - [Phase 124 - Off-site backup destinations](entries/2026-08-22-offsite-backup-destinations.md)
 - [Phase 125 - Virus/malware scanning](entries/2026-08-22-virus-malware-scanning.md)
+- [Phase 126 - Email archiving](entries/2026-08-22-email-archiving.md)
