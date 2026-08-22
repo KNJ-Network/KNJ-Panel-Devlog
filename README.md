@@ -126,3 +126,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 116 - Line-By-Line Bug Sweep: Correctness, Not Security](entries/2026-08-22-bug-sweep.md)
 - [Phase 117 - DNS-only comparison audit](entries/2026-08-22-dnsonly-comparison-audit.md)
 - [Phase 118 - webmail.domain and domain.com/webmail](entries/2026-08-22-webmail-dns-shortcut.md)
+- [Phase 119 - ftp/account/controller shortcuts, and closing the www SSL gap](entries/2026-08-22-ftp-account-controller-and-www-ssl.md)
