@@ -50,3 +50,35 @@ without ever calling the script; 4 `MailboxUsageControllerTest` — the breakdow
 empty their own Trash, an unsupported folder is rejected server-side even if a request bypasses the
 UI, and an owner can't purge another account's mailbox). Full suite 1,744 (up from 1,736), `pint --test`
 green.
+
+## Live-verify addendum: two real bugs, both satellite-related
+
+Live-testing this against a disposable mailbox (`cleanuptest@test.knj.network`, mail lives on the
+linked Mail Only satellite `mail.dev.knj.network`) surfaced two genuine bugs neither the unit nor
+feature tests could have caught, since both only exist on the cross-server dispatch path.
+
+**Bug 1 — stale satellites.** `usageForAccount()` came back with `trash_bytes`/`junk_bytes` stuck at
+zero even after fabricating real `.Trash`/`.Junk` maildir content directly on the satellite. Root
+cause: both linked satellites (`mail.dev.knj.network` and the DNS Only box at `62.31.247.87`) were
+still on v0.16.49 — five releases behind panel-dev — so the satellite was still running the old
+2-field `mail-usage-report` output. This traced back to a process gap: the "apply the update to both
+satellites" step of this session's own deploy routine got dropped for v0.16.50 through v0.16.54, only
+resurfacing when a feature that specifically depends on satellite-side script changes hit stale code.
+Fixed by re-running the update on both satellites; going forward this step runs after every release,
+not periodically.
+
+**Bug 2 — `mail-purge-folder` never added to the dispatch allowlist.** With satellites current, the
+Trash/Junk byte counts populated correctly, but calling `purgeFolder()` against the satellite-backed
+mailbox still failed with an empty error message. `MailDispatchController::ALLOWED_ACTIONS` — the
+explicit allowlist a linked Mail Only satellite checks before running any dispatched action locally —
+had never been updated when `mail-purge-folder` was added to `MailUsageService` and the provisioning
+script. Every dispatch attempt hit Laravel's `Rule::in()` validation and 422'd, which
+`ProvisioningScriptRunner`'s HTTP client surfaces as `successful: false` with no error text — exactly
+what was seen. Fixed by adding `mail-purge-folder` to the allowlist (shipped as v0.16.55), with a new
+regression test (`MailDispatchControllerTest::test_mail_purge_folder_is_dispatchable`) asserting it's
+reachable through the real dispatch route, not just `Process::fake()`'d locally.
+
+With both fixes live and satellites current, re-ran the full loop for real: usage report correctly
+showed `trash=67546 junk=40527` bytes on the fabricated data, `purgeFolder($mailbox, 'Trash')` dropped
+it to `691` bytes (Dovecot's own index overhead, not a bug), and `purgeFolder($mailbox, 'Junk')` did
+the same for Junk. Disposable mailbox and its maildir content cleaned up afterward.
