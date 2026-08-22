@@ -121,3 +121,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 111 - Mail Only Stage 4: Cross-Server Admin SSO](entries/2026-08-21-mail-only-stage-4-cross-server-sso.md)
 - [Phase 112 - Mail Only, fully closed out](entries/2026-08-22-mail-only-closeout.md)
 - [Phase 113 - Audit #12: The Setup Wizard's Missing Invariant](entries/2026-08-22-audit-12.md)
+- [Phase 114 - Audit #13: DNS Only, Reviewed as a Role Not a Diff](entries/2026-08-22-audit-13.md)
