@@ -64,6 +64,38 @@ written), `NginxSettingsTest` (both new redirect lines appear/are omitted correc
 `ProvisionAccountJobTest`'s record-count assertion updated (9 → 12).
 
 The `ssl` provisioning action's certbot logic has no automated test harness (same as every other
-bash-only change this session) — verified by hand-tracing the `set -e`/`if ! cmd; then` fallback
-pattern, matching the exact idiom already proven correct twice yesterday for the `issue-panel-cert`
-certbot fixes.
+bash-only change this session) — this pass live-verified it for real instead, end to end on
+`panel-dev`, which is exactly why it caught the bug below.
+
+## Live-verify addendum (same day)
+
+Shipped as v0.16.48, then live-verified against the real server:
+
+- **ftp/account/controller DNS records**: `restoreDefaultRecords()` on `test.knj.network` added all
+  three; `dig` confirmed all three resolve to the server's IP.
+- **account/controller path redirects and regex catch-alls**: both required a manual
+  `NginxSettingsService::apply()` + `PanelCertService::issue()` re-run to pick up the new code, since
+  neither the shared snippet nor the panel's own catch-all vhost auto-regenerates on a version
+  upgrade — they're only written when an admin re-saves Nginx Settings or Server Setup. (Real installs
+  hit this the same way: the shortcut only starts working once one of those pages is saved after
+  upgrading.) After that, both `https://test.knj.network/account` → `:2083/account` and `/controller`
+  → `:2087/controller`, plus the `account.test.knj.network` / `controller.test.knj.network` HTTP
+  catch-alls, redirected correctly.
+- **www SSL fix — found and fixed a real bug in the fix itself**: re-issuing SSL for
+  `test.knj.network` (which already had an apex-only certificate from before this fix) returned
+  success, but the resulting certificate's SAN list still only had `test.knj.network` — no `www`.
+  Checked `/var/log/letsencrypt/letsencrypt.log` and found the actual cause: certbot refuses to add a
+  new name to an *existing* certificate lineage without `--expand`
+  (`certbot.errors.MissingCommandlineFlag`), and under `--non-interactive` that error is fatal, not a
+  prompt. That meant the dual-SAN `certbot` call was failing on every account that already had a
+  certificate — which is nearly every real account, since initial provisioning always issues one —
+  and silently falling back to the apex-only retry, exactly the behavior this fix was supposed to
+  close. New accounts getting their very first certificate wouldn't have hit this, which is why the
+  original local testing (hand-tracing the bash logic, no real certbot lineage to test against)
+  missed it. Added `--expand` to both the primary and fallback `certbot` calls, re-verified on
+  `test.knj.network`: SAN list now correctly reads `DNS:test.knj.network, DNS:www.test.knj.network`.
+  Shipped as v0.16.49.
+
+Deployed to all three servers (`panel.dev.knj.network`, `mail.dev.knj.network`,
+`knj-dnstest-server`) via the standard cut-release → sync → Update Now cycle; all three confirmed on
+v0.16.49.
