@@ -70,5 +70,6 @@ continuation lines are consumed without attempting to parse them as records at a
 (expected, matches the existing single-line SOA handling), with exactly one warning naming the record
 type for any other multi-line record (a real but rare case; this parser still doesn't interpret
 continued rdata, it just now recognizes the shape instead of getting confused by it). Two new parser
-tests cover both paths. Re-ran the exact same export→import round-trip against `test.knj.network`
-after the fix: 12 records, zero warnings. Shipped as v0.16.51.
+tests cover both paths. Shipped as v0.16.51, deployed, then re-ran the exact same export→import
+round-trip against `test.knj.network` for real: 12 records, zero warnings — confirmed live, not just
+in tests.
