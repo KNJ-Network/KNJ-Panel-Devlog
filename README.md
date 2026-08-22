@@ -123,3 +123,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 113 - Audit #12: The Setup Wizard's Missing Invariant](entries/2026-08-22-audit-12.md)
 - [Phase 114 - Audit #13: DNS Only, Reviewed as a Role Not a Diff](entries/2026-08-22-audit-13.md)
 - [Phase 115 - Audit #14: A Secret Worth More Than It Should Have Been](entries/2026-08-22-audit-14.md)
+- [Phase 116 - Line-By-Line Bug Sweep: Correctness, Not Security](entries/2026-08-22-bug-sweep.md)
