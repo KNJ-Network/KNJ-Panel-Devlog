@@ -73,3 +73,37 @@ can't touch another account's mailbox quota or suspension state, suspend/unsuspe
 redirect; 2 `MailAuthMapServiceTest` additions — suspended mailboxes excluded from the pushed passwd-file
 entirely, quota_rule appended only for a capped mailbox). Full suite 1,759 (up from 1,745), `pint --test`
 green.
+
+## Live-verify addendum: three real bugs, all satellite-related
+
+Same pattern as the Email Disk Usage pass two entries back — live-testing against
+`mail.dev.knj.network` (Mail Only satellite) surfaced genuine bugs the unit/feature tests couldn't have
+caught, since all three only exist on the cross-server dispatch and passwd-file paths.
+
+**Bug 1 — `mail-dovecot-authmap-write`'s own line validator rejected the new extra field.**
+`updateQuota()` threw immediately: "invalid Dovecot auth map line." The provisioning script's
+`AUTHMAP_LINE_RE` — the regex gating every line written into `/etc/dovecot/mail-users`, a root-owned
+auth file — required the trailing extra-fields column to be exactly empty (`::$`), predating this
+feature. Fixed by extending the pattern to also accept `(quota_rule=\*:bytes=[1-9][0-9]*)?` — anchored
+to Dovecot's own quota_rule shape, not free-text, since this still feeds a privileged file.
+
+**Bug 2 — quota silently didn't enforce even once the line was accepted.** With bug 1 fixed, a real
+LMTP delivery of a 2MB message against a 1MB quota was accepted and saved to INBOX — no rejection, no
+error, `maildirsize`'s limit line read `0S` (unlimited) despite `quota_rule=*:bytes=1048576` being
+present in the file. Root cause: `/etc/dovecot/mail-users` is read by *both* the passdb and userdb
+`passwd-file` stanzas (see `auth-passwdfile.conf.ext`) — an unprefixed extra field on a shared file is
+ambiguous between the two, and Dovecot silently accepted the line without ever surfacing it to the
+quota plugin. The fix is Dovecot's own documented convention for this exact situation: prefix fields
+meant only for userdb with `userdb_`. Changed `MailAuthMapService` to emit `userdb_quota_rule=` instead
+of `quota_rule=`, and widened the line validator's regex to match. `dovecot-sql.conf.ext`'s own
+`user_query` was unaffected and needed no change — `password_query`/`user_query` are already two
+separate, unambiguous queries there, so the bare column name was correct all along on that path.
+
+**Confirmed for real, end to end**, after both fixes: created a disposable mailbox, set its quota to
+1MB, sent a 2MB message through the actual Postfix→Dovecot LMTP path (not a CLI shortcut) — accepted
+(first message under a fresh mailbox is always allowed regardless of size, standard LDA/LMTP behavior).
+Sent a second, trivial message immediately after — rejected: `552 5.2.2 Quota exceeded (mailbox for
+user is full)`, bounced by Postfix exactly as a real client would see it. `maildirsize`'s limit line
+correctly read `1048576S` throughout. Suspension confirmed separately via the auth map's own exclusion
+logic (no code path difference from the SQL side's `WHERE m.suspended = 0`, so no new live-only
+behavior to catch there). Disposable mailbox and test messages cleaned up afterward.
