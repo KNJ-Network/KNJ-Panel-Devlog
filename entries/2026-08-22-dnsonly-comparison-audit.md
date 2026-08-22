@@ -84,3 +84,8 @@ today's bug sweep before it can be added, not a same-day allowlist-only fix. Not
 Full local suite (1,703 tests, up from 1,701) and `pint --test` green. Added dedicated coverage in both
 `DnsOnlyRoleGateTest` and `MailOnlyRoleGateTest` proving all three new routes return 200 under their
 respective role, matching the existing Tier-1-parity test pattern in both files.
+
+Deployed as v0.16.44 to all three servers, version-confirmed on all three, then hit all three new routes
+for real against both live-linked satellites (not just Main, where they already worked) — six checks, all
+200: `/controller/security/firewall`, `/controller/security/access-control`, and
+`/controller/security/password-policy` on both `mail.dev.knj.network` and `knj-dnstest-server`.
