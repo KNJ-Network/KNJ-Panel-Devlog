@@ -48,3 +48,27 @@ batch, matching "Save All Records"' own "one regeneration, not one per row."
 19 new tests (12 for `ZoneFileParser` covering the record types, blank-name inheritance, unsupported
 types/directives, invalid values, TTL clamping, comment stripping; 7 feature tests for export/import
 including the reseller-permission boundary) — full suite now 1,729 (up from 1,710), `pint --test` green.
+Live-verified end to end on `panel.dev.knj.network`: real export of `test.knj.network` downloaded a
+valid BIND zone file (correct SOA, all 12 records present, DKIM TXT correctly split into two quoted
+chunks).
+
+## Live-verify addendum (same day) — round-tripping the export caught a real bug
+
+Fed the just-downloaded export straight back into import (the single most likely real-world action:
+"let me see what happens if I re-upload what I just downloaded," or importing the same zone onto a
+different domain) and got 12 correctly-parsed records plus 5 confusing warnings — `"Line 3: couldn't
+find a record type, skipped"` repeated for what were actually just the SOA's own continuation lines.
+
+Root cause: `buildZoneFile()` has always emitted the SOA as a standard multi-line parenthesized block
+(refresh/retry/expire/minimum each on their own line inside `( ... )`), which `ZoneFileParser`
+correctly doesn't interpret — multi-line records were explicitly out of scope from the start — but
+didn't recognize as a group either, so each continuation line got misread as its own malformed record
+instead of being silently swallowed as part of the SOA the way a single-line SOA already is.
+
+Fixed by tracking open/close paren balance across lines: while inside an unclosed `(...)` group,
+continuation lines are consumed without attempting to parse them as records at all — silently for SOA
+(expected, matches the existing single-line SOA handling), with exactly one warning naming the record
+type for any other multi-line record (a real but rare case; this parser still doesn't interpret
+continued rdata, it just now recognizes the shape instead of getting confused by it). Two new parser
+tests cover both paths. Re-ran the exact same export→import round-trip against `test.knj.network`
+after the fix: 12 records, zero warnings. Shipped as v0.16.51.
