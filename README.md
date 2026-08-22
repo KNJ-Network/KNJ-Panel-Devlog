@@ -119,3 +119,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 109 - Mail Only Stage 3 Continues: the Rest of the Dispatcher Migration](entries/2026-08-21-mail-only-stage-3-tier-a-b-c.md)
 - [Phase 110 - Mail Only Stage 3 Wraps Up: Service Status Stops Lying About Where Mail Runs](entries/2026-08-21-mail-only-stage-3-service-status-split.md)
 - [Phase 111 - Mail Only Stage 4: Cross-Server Admin SSO](entries/2026-08-21-mail-only-stage-4-cross-server-sso.md)
+- [Phase 112 - Mail Only, fully closed out](entries/2026-08-22-mail-only-closeout.md)
