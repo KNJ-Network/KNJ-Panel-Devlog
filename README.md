@@ -131,3 +131,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 121 - Mail client autoconfiguration](entries/2026-08-22-mail-client-autoconfiguration.md)
 - [Phase 122 - Email Disk Usage cleanup](entries/2026-08-22-email-disk-usage-cleanup.md)
 - [Phase 123 - Per-mailbox quota and suspension](entries/2026-08-22-mailbox-quota-and-suspension.md)
+- [Phase 124 - Off-site backup destinations](entries/2026-08-22-offsite-backup-destinations.md)
