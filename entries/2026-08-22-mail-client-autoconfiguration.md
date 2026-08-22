@@ -73,4 +73,6 @@ always not the same as the customer's own domain), to actually exercise the brok
 it. Fixed with a new `absolutizeSrvTarget()` that splits SRV's `weight port target` value and
 absolutizes only the trailing target field, mirroring the same `absolute()` helper CNAME/MX/NS already
 use. New regression test (`test_exported_zone_file_absolutizes_srv_targets`) covers a cross-domain
-target directly. Shipped as v0.16.53.
+target directly. Shipped as v0.16.53, deployed, then rewrote `test.knj.network`'s zone file for real
+and re-ran the exact same `dig` query: `0 1 993 mail.dev.knj.network.` — correct, no zone suffix
+appended. Confirmed live, not just in tests.
