@@ -134,3 +134,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 124 - Off-site backup destinations](entries/2026-08-22-offsite-backup-destinations.md)
 - [Phase 125 - Virus/malware scanning](entries/2026-08-22-virus-malware-scanning.md)
 - [Phase 126 - Email archiving](entries/2026-08-22-email-archiving.md)
+- [Phase 127 - Subscribers & Marketing Email, and a Blade Bug Hiding in Plain Sight](entries/2026-08-24-subscribers-marketing-email.md)
