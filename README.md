@@ -114,3 +114,6 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 125 - Virus/malware scanning](entries/2026-08-22-virus-malware-scanning.md)
 - [Phase 126 - Email archiving](entries/2026-08-22-email-archiving.md)
 - [Phase 127 - Subscribers & Marketing Email, and a Blade Bug Hiding in Plain Sight](entries/2026-08-24-subscribers-marketing-email.md)
+- [Phase 128 - Web Application Firewall (ModSecurity + OWASP CRS)](entries/2026-08-24-web-application-firewall.md)
+- [Phase 129 - CalDAV/CardDAV (Calendars & Contacts Sync)](entries/2026-08-24-caldav-carddav.md)
+- [Phase 130 - Audit #15: A Toggle That Didn't Do What It Said](entries/2026-08-25-audit-15-pre-production-sweep.md)
