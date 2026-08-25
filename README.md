@@ -117,3 +117,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 128 - Web Application Firewall (ModSecurity + OWASP CRS)](entries/2026-08-24-web-application-firewall.md)
 - [Phase 129 - CalDAV/CardDAV (Calendars & Contacts Sync)](entries/2026-08-24-caldav-carddav.md)
 - [Phase 130 - Audit #15: A Toggle That Didn't Do What It Said](entries/2026-08-25-audit-15-pre-production-sweep.md)
+- [Phase 131 - Alerting: The Part That Was Missing From Every Health Check](entries/2026-08-25-admin-alerting-and-account-notifications.md)
