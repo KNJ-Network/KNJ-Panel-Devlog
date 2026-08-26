@@ -947,3 +947,172 @@ findings:   many   4  ~30  9  13  13   5   2   2   0   2  ~20  ~15
 ```
 
 A further confirmation round may follow if requested, same standing discipline as every round above.
+
+## Round eighteen — closing the propagation gaps round seventeen found
+
+A short, direct follow-up: round seventeen's own 15 findings, fixed and verified. The 9 controllers
+with the copy-pasted "already running" race each got the same `Cache::lock()->block(5, ...)` treatment
+already applied to `GitDeployController`; the mailbox/mailing-list local-part race got the shared
+`"mail-local-part:{$site->id}:{$localPart}"` lock plus `QueryException`-to-friendly-error handling on
+both sides; the 4-service mail auth-map family and 6 more `sync()`-style methods each got their own
+lock, six of them converting `LockTimeoutException` to a friendly `RuntimeException` since their
+callers roll back via `try/catch(RuntimeException)` rather than `DB::transaction()`; the
+`servers.ip_address` gap got a real unique constraint plus a matching catch on the create race; and the
+CalDAV/CardDAV pagination bug got the one-line fix. Two agents split the fixes with no overlap. Full
+suite at 2,197 tests, `pint --test` clean, deployed and confirmed live via SSH.
+
+With round seventeen's fix set closed out, the plan was to run a confirmation pass and, if that came
+back clean, cut a release — the same rhythm every prior methodology change has followed.
+
+## Rounds nineteen and twenty — "no, do it properly," and it was right to ask
+
+Before that confirmation pass ran, the question of whether to cut got raised directly, and the honest
+answer was: no methodology used so far had actually gone two consecutive rounds clean on a *newly
+introduced* technique — round fourteen's clean pass was the old technique fully exhausted, not this
+one. Two things were offered instead of an immediate cut: a **targeted mechanical sweep** re-checking
+the two exact patterns round seventeen had just fixed (not a fresh open-ended review) across every call
+site in the codebase, and — if that also found more — a genuine methodology upgrade rather than another
+repeat of the same fresh-eyes format.
+
+**The targeted sweep immediately proved itself.** The check-then-act lock pattern came back completely
+clean — every site already fixed, backed by a real DB constraint, or genuinely idempotent under
+re-dispatch. The sync()-rebuild lock pattern did not: **9 more instances**, including two with real
+operational weight. `DnsZoneService::writeZone()` itself — the method three of its own sibling methods
+already wrapped in a lock — was unlocked when called directly by half a dozen other controllers/
+services. And `MailServerConfigService`/`MailServerSettingsService`'s override-merge `apply()` had a
+genuine lost-update race: two admins saving different fields on different mail-settings pages within
+the same window could each read a stale value for the other's just-persisted field and silently drop
+it from the live Postfix/Dovecot config on write — the widest blast radius of anything this sweep found,
+reachable from at least five independent call sites across the mail-configuration surface.
+
+**That result was reported honestly, together with what it meant: the two-fresh-audits-in-a-row
+pattern this project had leaned on for confidence had a real blind spot the whole time.** Every prior
+round used fresh-eyes review — read the code, use judgment, flag what looks wrong. That's good at
+finding a bug the first time; it's unreliable at the mechanical task of checking "was this exact fix
+propagated everywhere it should have been," because that's a cross-referencing exercise, not a
+judgment call. The targeted sweep worked specifically because it stopped relying on judgment and
+instead grepped for one exact shape and checked every call site against it, one by one — a different,
+more reliable technique for that specific kind of question.
+
+**The response was to scale that technique up, not just fix the 9 findings and stop.** Six parallel
+mechanical sweeps ran across every major bug pattern this whole audit has ever found — not sampling,
+not fresh judgment, but exhaustively grepping every call site of a given shape and checking each one's
+current code, cross-referencing nothing against "should already be fixed" assumptions:
+
+- **Persist-before-verify**, split three ways (mail/DNS/DB services, security/files/software services,
+  every controller) — the technique that closed out rounds six through fourteen, re-run mechanically
+  rather than via the create/delete-sibling comparison, specifically because that comparison depends on
+  a reviewer noticing the sibling exists.
+- **Uncaught Process-timeout / stuck-run model-list completeness** — the class round fifteen and
+  sixteen's resume-sweep addressed, re-verified against every `Process::timeout()` call site and every
+  Run-shaped model in `app/Models/`.
+- **DB-constraint-backed create-race completeness** — every `::create()` call against a model with a
+  real unique constraint, checked for a matching `QueryException` catch, plus a check for models that
+  plausibly need a constraint they don't have.
+- **IDOR/authorization**, a third independent pass using a different technique than the two prior
+  fresh-review passes: systematic cross-referencing of every mutating action against its siblings
+  across account/API/WHM, rather than reading each controller in isolation.
+
+**Two of the six came back genuinely clean** — uncaught-timeout/stuck-run completeness (every
+`Process::timeout()` call site already correctly wrapped, the `ResumeStuckSystemRuns` model list
+already complete against every Run-shaped model in `app/Models/`) and IDOR/authorization (a third
+independent pass, ~450 mutating actions cross-checked, two near-misses investigated and correctly
+ruled out rather than hand-waved past). **The other four found real, substantial issues** — roughly 68
+distinct findings before deduplication, collapsing to about 45 after tracing shared root causes (the
+`LockTimeoutException`/`RuntimeException` mismatch alone explained 9 separate controller-level
+symptoms once traced back to `DnsZoneService`).
+
+In severity order, the notable ones:
+
+**`WebdavAccountService::changePassword()` was completely silent on failure — the most severe finding
+of the whole sweep.** It persisted the new password hash to the DB, then called `writeHtpasswd()`,
+which called a bare `file_put_contents()` with no return-value check at all — unlike this exact file's
+own `create()`/`delete()`, which both carefully guard this. A disk-full or permissions failure meant
+the DB showed the new password as active, the UI said "Password updated," and the real htpasswd file
+nginx actually authenticates against silently kept the old password — with zero error signal anywhere.
+Worse than a raw 500, since nothing at all indicated anything had gone wrong. Fixed to check the write
+and roll the DB hash back to the previous value on a confirmed failure, mirroring `create()`'s own
+rollback shape.
+
+**The `LockTimeoutException`/`RuntimeException` mismatch was systemic, not a one-off.** `DnsZoneService`'s
+four locked public methods left the exception type uncaught on the theory that `DB::transaction()`
+rollback happens regardless of whether it's caught — true for data integrity, but every one of
+`Account/DnsController`, `DynamicDnsController`, `Api/DnsRecordController`, the public Dynamic DNS
+update endpoint, and `Whm/DeliverabilityController` already had `catch (RuntimeException $e)` written
+specifically to show a friendly message on exactly this failure mode — dead code that looked handled
+but wasn't. A separate instance of the same class of gap turned up in `GitDeployWebhookController`
+itself, which round seventeen had treated as the established "leave it uncaught" reference — the
+precedent nine other fixes were built on turned out to rest on an existing, unnoticed bug, not a
+deliberate design choice. All now convert to a friendly `RuntimeException`, and both the webhook
+controller and its account-side sibling `GitDeployController::deployNow()` now give the same graceful
+"already running" response on genuine lock contention that their fast-path check already gave for the
+common case.
+
+**~30 more create-race sites had a real unique constraint but no friendly-error handling** — the exact
+same mechanical fix already applied to `WebdavAccountService`/`ServerController` last round, just never
+propagated to `AccountProvisioningService`'s `createAccount()`/`convertAddonDomainToAccount()`,
+`AccountCollaboratorService`, `DomainsController`, `IpBlockerService`, `DirectoryPrivacyService`,
+`DirectoryIndexService`, `MailingListService`, `WebmailContactsController`, `SubscriberService`'s CSV
+import path, `FirewallService`, `DynamicDnsService`, both CalDAV/CardDAV backends (which needed
+`Sabre\DAV\Exception\Conflict` instead of a generic exception, to keep the DAV protocol response
+intact), `PhpVersionController`, and `ResellerController`. `servers.hostname` also had no constraint at
+all, alongside `servers.ip_address`'s from last round — added, with a matching pre-check on
+`ServerController::completeLink()` and the three server-bootstrapping console commands.
+
+**~15 more missing-catch and persist-before-verify bugs**, all found by the controller-sweep's
+systematic sibling comparison: `Whm\AccountController`'s `store()`/`updatePassword()`/`destroy()`/
+`bulkDestroy()` all lacked the try/catch their own sibling `suspend()`/`unsuspend()` already had (the
+same file, the exact comparison technique that closed rounds six through fourteen, just never run
+mechanically against every method in every file); `AccountImportController`/`CpanelImportController`/
+`AddonDomainConversionController::store()` had the identical gap; `NginxSettingsController`/
+`PhpSettingsController` persisted every Setting before confirming `apply()` succeeded — and a naive
+reorder would have made it wrong in a *different* way, since both services read `Setting::get()`
+directly rather than taking new values as a parameter, so both got refactored to take an explicit
+`$data` array instead, with `WafService`/`InstallWafEngineJob`/`PanelCertService` (re-apply-from-
+current-state callers) updated to a new `NginxSettingsService::currentSettings()` helper;
+`MailSettingsController::updateServer()`'s `mail.active_server_id` switch had the same stale-read
+exposure as the mail-settings lost-update race above, now going through the same lock;
+`SecurityController::unban()`/`FirewallService::unban()` called `fail2ban-client` completely
+unwrapped; `BackupHistoryController::destroy()`, `Api\AccountController::suspend()`/`unsuspend()`,
+`DnsOnlyZoneSyncController::sync()`, and `DnsReplicationController::syncNow()`'s unprotected IP
+fallback all got the missing catch their siblings already had; `SystemPackageUpdateService::
+fetchPendingUpdates()` got the same `ProcessTimedOutException` catch its own sibling `apply()` already
+documents needing, plus a reorder so a failed check no longer overwrites the last-checked timestamp
+with a false-clean state; `BackupService::delete()` now checks the real `rm -rf` result before dropping
+the DB row, instead of silently orphaning the files on a failed removal; `MariadbUpgradeService::
+runStreaming()` no longer persists a `snapshot_path` that looks usable on a run that ultimately failed;
+and `SubscriberService::subscribe()`/`confirm()` now log-and-continue on a synchronous mail-send
+failure rather than 500ing after the real subscription state change already succeeded, while the
+sibling `SubscriberCampaignController::sendTest()` — which has no real state worth preserving — gets
+the opposite fix, a proper error surfaced instead of silent success.
+
+Seven fix agents split the ~45 findings with no overlap (one accidental double-assignment — both
+independently reached the identical correct fix for `DnsClusterService`, detected the collision, and
+one deferred to the other rather than duplicating). Two items were deliberately **not** blindly fixed:
+`AccountProvisioningService::removeAccount()` deletes an account's DB rows before the real system-level
+teardown confirms success, and `convertAddonDomainToAccount()` commits the DB reparenting before the
+actual conversion job runs, with no revert on failure — both real gaps, but account deletion/conversion
+is high-blast-radius enough to warrant a deliberately-designed fix in a dedicated round rather than a
+rushed one under this sweep's own momentum.
+
+Full suite now at 2,302 tests (up from 2,197), `pint --test` clean across the whole repository.
+Live-verified: deployed commit confirmed live via SSH, both new unique-constraint migrations
+(`servers.ip_address` from last round, `servers.hostname` from this one) confirmed `Ran`, queue worker
+confirmed restarted fresh.
+
+```
+round:    initial  6   7   8   9  10  11  12  13  14  15  16  17  18  19
+findings:   many   4  ~30  9  13  13   5   2   2   0   2  ~20  ~15  15  ~45
+```
+
+**What this pair of rounds actually settled.** The count going back up after round eighteen's short,
+clean-looking fix pass isn't the methodology failing — it's confirmation that "the last round's fixes
+looked complete" is not the same claim as "the last round's fixes *were* complete," and that the gap
+between those two claims is exactly what a mechanical, exhaustive, cross-referencing sweep catches and
+a fresh-eyes review — no matter how many times repeated — structurally cannot. Two techniques (IDOR,
+uncaught-timeout) that had already gone through fresh-eyes review twice were re-checked a third time,
+this time mechanically, and came back genuinely clean both times — that's real signal, not noise, in a
+way that "round fourteen was clean" alone couldn't fully support in hindsight. The standing plan going
+forward: any future confirmation round uses this mechanical, every-call-site technique by default, not
+the fresh-eyes format rounds six through seventeen relied on — fresh-eyes finds a bug once; only
+exhaustive cross-referencing confirms a fix actually landed everywhere it needed to.
