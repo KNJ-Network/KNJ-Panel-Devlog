@@ -514,4 +514,33 @@ One fix agent (this round's finding set was small enough not to need two) covere
 (2,148 tests, up from 2,141) and `pint --test` both clean. Live-verified: reloaded the Access Control
 page on panel.dev.knj.network post-deploy, loads clean with no errors.
 
-A twelfth re-audit round against this fix set is in progress before any version bump or release cut.
+## Re-audit: round twelve
+
+Round twelve ran all seven batches with fresh-eyes instructions rather than mere re-confirmation of prior
+verdicts, and turned up two more real findings — both from the same "compare a fixed create/delete
+sibling against every other unchecked mutating pair" technique, applied to two call sites the prior eleven
+rounds hadn't reached yet.
+
+**`Api\DnsRecordController::store()`/`destroy()`** had the identical persist-before-verify bug as the
+account-side web `DnsController` and `SubdomainService::create()`/`destroy()` — both already fixed in
+earlier rounds — except this one lived in the token-authenticated public API surface, which none of the
+prior rounds' file lists happened to cover. `store()` created the `DnsRecord` row, then called
+`writeZone()`; `destroy()` deleted it, then called `writeZone()`. Either way, a failed BIND write (bad
+zone data, `named-checkzone` rejecting it) left the database permanently out of sync with the live zone,
+with only a 422 response and no rollback. Fixed by wrapping both in `DB::transaction()`, mirroring
+`DnsController::store()`/`destroy()` exactly. Two regression tests fake a failing `dns-zone-write` and
+assert the create rolls back / the delete never happens.
+
+**`AddonDomainConversionController::create()`/`store()`** never checked the `accounts.create` reseller
+permission that every other account-creation path (`AccountController::create()`/`store()`) already
+enforces — a reseller with that permission revoked could still create a brand-new account by converting
+one of their own addon domains, since "Convert to Account" creates a real new `Account` row under the
+hood. The "Convert to Account" link on the Parked Domains list was also unconditionally shown regardless
+of the permission. Fixed by adding the same `abort_unless(hasResellerPermission('accounts.create'))`
+check both actions' siblings already have, and hiding the nav link behind the same check. Two regression
+tests cover both the form and the submit path being blocked for a reseller with the permission revoked.
+
+Full suite now at 2,152 tests (up from 2,148), `pint --test` clean. Live-verified: reloaded the Parked
+Domains page on panel.dev.knj.network post-deploy, loads clean with no errors.
+
+A thirteenth re-audit round against this fix set is next before any version bump or release cut.
