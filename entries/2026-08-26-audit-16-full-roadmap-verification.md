@@ -280,4 +280,66 @@ exact scoping. Added the matching test.
 Full suite (2,030 tests, up from 2,028) and `pint --test` both clean. Live-verified: reloaded the
 Email Archiving page on panel.dev.knj.network post-deploy, loads clean with no errors.
 
-A seventh re-audit round against this fix set is in progress before any version bump or release cut.
+## Re-audit: round seven
+
+The seventh round of the 7-agent audit turned up the biggest single finding of this whole
+verification pass: the "persist Settings/a DB row before confirming the privileged provisioning
+script actually succeeded" bug — the exact class fixed for `ClamavService` and `TlsPolicyService` in
+earlier audits, and for `EmailArchivingService`/`DatabaseConfigService` in round six above — was
+never actually fixed everywhere. It was present, unfixed, in roughly thirty more services spanning
+almost the entire mail-configuration subsystem plus most of the account-side per-domain site toggles:
+`DnsClusterController`, `MailSettingsController`, `SpamFilterService`, `SpamdSettingsService`,
+`MailRelayController`/`MailRelayService`, `MailServerConfigController`, `MailFilterService`,
+`GreylistingService`, `GreylistExemptionService`, `FtpSettingsController`, `LogRotationController`,
+`WebdavAccountService`, `FirewallService`, `WafService`, `SystemCronJobService`, `CronJobService`,
+`AutoresponderService`, `MailRuleService`, `MailboxService::createForwarder()`, `SpamScoringController`,
+`ChallengeResponseService`, `DnsController` (account-side Zone editor), `DynamicDnsService`,
+`IpBlockerService`, `HotlinkProtectionService`, `LeechProtectionService`, `OptimizeWebsiteService`,
+`DirectoryIndexService`, `ErrorPageService`, and `MimeTypeService`. In every case, a failed script
+call left the panel UI reporting a change as applied when the real server-side config, vhost snippet,
+crontab entry, or sieve script was never actually touched.
+
+A handful of these were worse than a stale-looking UI. `LeechProtectionController` only caught
+`FileManagerException`, not the `RuntimeException` a failed sync actually throws, so a real failure
+was an uncaught 500 with the DB already changed underneath it. `CronJobController::destroy()`
+(account-side) had no try/catch at all around a call that can throw — a failed cron-sync deleted the
+job from the database while the real crontab entry survived, orphaned, with no UI left to find or
+remove it. `DynamicDnsService::deleteHost()` had the same shape: a failed zone write could leave a
+live A record on the wire with no DB row and no UI control pointing at it anymore. `WafController`'s
+settings-save action had no try/catch either, so a failed apply surfaced as a raw 500 instead of an
+error flash.
+
+Two different fix shapes were needed depending on how each script call actually reads its content.
+Where a service builds the script's input purely from the method's own parameters (the
+`ClamavService`/`TlsPolicyService` shape), the fix was a straight reorder — run the script, confirm
+success, only then persist. Several services turned out to have their `apply()`-style method
+re-reading `Setting::get()` for the very values being saved, which would have made a naive reorder
+persist-then-apply-stale-values instead of fixing anything — `DnsClusterService`, `MailServerSettingsService`,
+`MailRelayService`, and `MailServerConfigService` were refactored so `apply()` takes the new values as
+parameters instead. Where the privileged script itself queries the DB row being written (most of the
+per-domain nginx-snippet services, and the DNS/DynamicDNS zone writers), a clean pre-persist reorder
+isn't possible — those were wrapped in `DB::transaction()` so a failed script call rolls the write
+back, following the precedent `SystemCronJobService`/`MailRuleService` already established for exactly
+this case. `WebdavAccountService` and `FirewallService` needed explicit rollback-and-cleanup (deleting
+the just-created row and any file it wrote) rather than a transaction, since the row has to exist on
+disk before the script that validates it can run.
+
+Every one of the ~30 fixes shipped with a regression test that fakes a failing script call and asserts
+the Setting/DB row stayed at its prior value — including renaming two existing tests
+(`FtpSettingsTest`, `LogRotationTest`) that had literally asserted the buggy behavior as correct
+(`test_a_failed_apply_shows_an_error_but_still_saves`) into ones that assert the fixed behavior
+instead. Alongside the main fix wave: `InitialSetupController::storeBasics()` was checking nothing
+about whether its `set-hostname`/`set-timezone` script calls actually succeeded, silently letting the
+setup wizard advance and permanently lock `setup.completed_at` even on failure — now checked and
+blocking; `SslControllerTest` had zero coverage of the custom-certificate upload flow at all (the
+underlying code was already correct) — added; and four more `docs/roadmap.md` bullets (Hotlink
+Protection, Directory Listing Style, Custom Error Pages, Custom MIME Types) plus the public
+roadmap.json's WebDAV access note needed the same primary-domain-only scope disclosure already applied
+to their siblings in earlier rounds.
+
+Five parallel fix agents split the ~30 files with no overlap, each adding its own regression tests and
+confirming its own slice of tests passed before handing back. Full suite (2,081 tests, up from 2,030)
+and `pint --test` both clean after merging all five. Live-verified: reloaded the Mail Relay and WAF
+settings pages on panel.dev.knj.network post-deploy, both load clean with no errors.
+
+An eighth re-audit round against this fix set is in progress before any version bump or release cut.
