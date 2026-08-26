@@ -543,4 +543,48 @@ tests cover both the form and the submit path being blocked for a reseller with 
 Full suite now at 2,152 tests (up from 2,148), `pint --test` clean. Live-verified: reloaded the Parked
 Domains page on panel.dev.knj.network post-deploy, loads clean with no errors.
 
-A thirteenth re-audit round against this fix set is next before any version bump or release cut.
+## Re-audit: round thirteen
+
+Round thirteen's roadmap-row list also caught up on a genuine gap in the audit's own bookkeeping: "KNJ
+Webmail (custom client)" — the flagship from-scratch webmail client this project is largely built around
+— had somehow been missing from every batch's item list since round nine, a row-extraction bug in the
+audit's own tooling rather than anything wrong with the feature. It got a first real audit pass this
+round: CONFIRMED, with real cross-account authorization checks (messages/attachments are never
+DB-owned — resolved live via per-session IMAP credentials, so cross-account access is structurally
+prevented by the mail server's own auth; contacts and filing rules, which are DB-backed, have explicit
+ownership checks with dedicated tests) and roughly 900 lines of feature test coverage across compose,
+drafts, bulk actions, folders, search, sort, CSV import, and HTML sanitization.
+
+Two real findings, both in the DNS/mail-provisioning layer:
+
+**`DnsZoneService::createZoneForSite()`** — the primary zone-creation path, called on every new account
+and every new domain — created the `DnsZone` row and every one of its records before `writeZone()`
+confirmed the BIND write actually succeeded, with no rollback. The exact same file already had three
+sibling methods (`restoreDefaultRecords()`, `ensureMailAuthRecords()`, `importRecords()`) correctly
+wrapping this scenario in `DB::transaction()`, each with a comment explaining why — the zone-creation
+path itself was simply never brought in line. A failed write left a zone the database reported as fully
+configured that was never actually pushed to BIND, silently, since both callers (`ProvisionAccountJob`
+and the account-side `DomainsController`) already treat this as best-effort and just log the failure.
+Fixed the same way as its siblings; a new regression test fakes a failing `dns-zone-write` and asserts
+neither the zone row nor any of its records survive.
+
+**`dovecot-auth-sql.conf.ext.2.4.template`** — the more serious of the two, and the kind of bug this
+audit exists to catch: a deploy-script gap rather than an application-code one, invisible to the PHP
+test suite entirely. The 2.3 template (`dovecot-sql.conf.ext.2.3.template`) filters suspended mailboxes
+out of its passdb login query and returns a `quota_rule` field from its userdb query; the Mail Only
+satellite push (`MailAuthMapService`) does the same, in its own passwd-file format. The 2.4 rewrite —
+used automatically on any Main server running Dovecot 2.4, which `setup-mail-server.sh` targets on
+newer Ubuntu releases — dropped both. Net effect: on a 2.4 Main install, suspending a mailbox from the
+panel updated the database but the mailbox could still log in and receive mail over IMAP/POP3 exactly
+as before, and no per-mailbox quota was ever enforced regardless of what was configured. Fixed by
+adding the identical `AND m.suspended = 0` filter and `quota_rule` `CASE` expression to the 2.4 query,
+plus a comment pointing at the 2.3/satellite precedent so a future rewrite of this file doesn't drop
+them a third time. No Dovecot-2.4 server exists yet to live-verify the mail-serving behavior itself
+against (`panel-dev` runs 2.3) — verified by direct comparison of the generated SQL against the
+already-proven 2.3/satellite queries instead; live verification against a real 2.4 install is still
+owed once one exists.
+
+Full suite now at 2,153 tests (up from 2,152), `pint --test` clean. Live-verified: reloaded DNS Zones
+on panel.dev.knj.network post-deploy, loads clean with no errors.
+
+A fourteenth re-audit round against this fix set is next before any version bump or release cut.
