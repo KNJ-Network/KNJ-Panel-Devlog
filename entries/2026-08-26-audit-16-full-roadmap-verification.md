@@ -481,4 +481,37 @@ Two fix agents split the 13 findings across ~33 files with no overlap. Full suit
 2,123) and `pint --test` both clean. Live-verified: reloaded the Resource Monitor and Servers pages on
 panel.dev.knj.network post-deploy, both load clean with no errors.
 
-An eleventh re-audit round against this fix set is in progress before any version bump or release cut.
+## Re-audit: round eleven
+
+Round eleven found fewer bugs than any round since the create-vs-delete-sibling technique was adopted —
+five instances, down from thirteen in round ten — which is the trend that matters more than any single
+round's count: 30 → 9 → 13 → 13 → 5. The finds themselves stayed real, though, including the single
+worst bug this whole audit has turned up.
+
+**`FirewallService::remove()` was fail-open.** `add()` (already correctly fixed) creates the
+`FirewallRule` row, syncs the ufw config, and rolls the row back if the sync fails. `remove()` did the
+exact opposite, in the wrong order: it deleted the row *before* calling `sync()`, with no rollback at
+all. If that sync failed — the ufw rule set never actually rewritten — the database already showed the
+IP as removed while the real firewall kept allowing it through. Every other instance of this bug class
+found across eleven rounds left the panel *overclaiming* that a protection was in place; this one
+undersold what was actually still blocked, which is the more dangerous direction. Fixed with the same
+snapshot-delete-sync-restore-on-failure shape already used by `WafService::setSiteMode()`, with a
+regression test that fakes a failed sync and asserts the original rule is still present in the database
+afterward.
+
+Four smaller instances of the same family, all found by the same by-now-standard comparison of a fixed
+create/enable action against its never-checked delete/disable sibling: `SubdomainService::create()`/
+`destroy()` were missing the `DB::transaction()` wrap its direct sibling `DynamicDnsService` already had;
+`ApiTokenController::destroy()` was missing the `ensureFeatureEnabled('api_tokens')` check its own
+`index()`/`store()` already had, letting a customer whose package no longer includes API tokens still
+revoke them; `DatabaseManagerService::revokeRemoteHost()` had the identical asymmetric-rollback shape as
+the firewall bug (lower severity here, since the underlying MySQL credential revocation already happens
+first — a failed sync only leaves a stale, credential-less firewall allow-rule, not live unauthorized
+access); and `TransferToolController::destroySource()` turned out to already be correct, just entirely
+untested.
+
+One fix agent (this round's finding set was small enough not to need two) covered all five, full suite
+(2,148 tests, up from 2,141) and `pint --test` both clean. Live-verified: reloaded the Access Control
+page on panel.dev.knj.network post-deploy, loads clean with no errors.
+
+A twelfth re-audit round against this fix set is in progress before any version bump or release cut.
