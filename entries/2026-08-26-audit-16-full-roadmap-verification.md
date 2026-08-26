@@ -227,3 +227,24 @@ Database Upgrade page on panel.dev.knj.network post-deploy and confirmed the new
 renders correctly against the real week-old snapshot already on that box.
 
 A fifth re-audit round against this fix set is in progress before any version bump or release cut.
+
+## Re-audit: round five
+
+Six of the seven batches came back completely clean this time — every item CONFIRMED, including
+independent re-verification of all three round-four fixes (the sender-domain race, the Convert Addon
+Domain PHP reset, and the snapshot staleness warning). The seventh batch found one thing: Calendars &
+contacts sync's roadmap note has claimed since it shipped that ".well-known resolution" was "verified"
+alongside the DNS SRV records and the protocol-level PROPFIND/MKCALENDAR/PUT/GET round trip — but no
+test anywhere actually proved `NginxSettingsService` writes the `/.well-known/caldav` and
+`/.well-known/carddav` redirects. The sibling `/webmail`, `/account`, and `/controller` shortcuts,
+written by the same method right next to these two lines, have had exactly this kind of test since
+they shipped; the CalDAV ones never got the same treatment. Not a functional bug — the redirects
+themselves were already correct, live-verified with real `curl` requests when CalDAV/CardDAV first
+shipped — just a real, specific gap between what the roadmap claimed was tested and what the test
+suite actually covered. Added both the presence case (redirects appear once `panel.hostname` is known)
+and the omission case (nothing written before then), mirroring the existing webmail/account/controller
+tests exactly.
+
+Full suite (2,028 tests, up from 2,026) and `pint --test` both clean.
+
+A sixth re-audit round against this fix set is in progress before any version bump or release cut.
