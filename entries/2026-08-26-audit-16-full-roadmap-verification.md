@@ -105,3 +105,44 @@ also live-triggered for real against panel.dev.knj.network's PHP 8.5 and confirm
 page's own live `php -m` check, not just a database flag.
 
 Full suite (2,009 tests) and `pint --test` both clean.
+
+## Re-audit: round two
+
+Per standing instruction, the same seven-way independent verification was re-run from scratch against
+the deployed fixes above — same method, no memory of the first pass's findings carried in, everything
+re-derived from the code as it now stood. It came back with one more real bug and eleven more stale
+roadmap lines.
+
+**The PHP version fix above was incomplete.** `PhpVersionService::setSiteVersion()` correctly resolved
+*which* site to target via `site_id` instead of always assuming primary, but it then only updated that
+one site's own database row. The underlying constraint is the same one already documented above — one
+PHP-FPM pool per system user, shared by every domain on the account — so switching site A to PHP 8.2
+and then site B to PHP 8.3 left site A's database row still claiming 8.2 while the one real, shared
+pool (and thus what site A actually serves) was 8.3. Fixed by having the update apply to every site on
+the account, not just the one passed in, so the stored state can never drift from the one real version
+being served. The WHM copy was tightened further to say so explicitly. A regression test creates two
+sites on one account, pins one, and asserts both rows come out in sync.
+
+**Eleven more roadmap lines had drifted**, same shape as the first seven: claims that were true when
+written and quietly stopped being true as the surrounding features changed. Mail routing, certificate
+upload, database/user management, and per-account PHP configuration notes all implied a Controller-side
+counterpart to the account-side feature that was never actually built — corrected to say so plainly.
+Per-package feature control's toggleable-feature count was stale (26, actually 34). Three separate
+notes still referenced a "Server Settings" page from before it was folded into Server Setup — the first
+pass's fix for Timezone configuration's Server Setup reference apparently missed its two siblings (DNS
+resolver configuration, Remote reboot), now all three are consistent. Custom error pages and custom
+MIME types were still described as "per domain" — like the earlier PHP scope issue, both are genuinely
+account-wide (applied to the primary domain's vhost), not independently configurable per addon domain.
+
+**One coverage gap remained**: `SystemRebootController::store()` had no test at all — the existing
+`ServerSetupTest` only asserted the button's label text rendered on the page, never submitted it or
+checked that it actually calls the privileged script. Added both the success path (asserts
+`reboot-server` reaches the provisioning script) and the failure path (asserts the error surfaces in
+the session flash instead of silently claiming success), plus the same non-admin/reseller-forbidden
+checks every other WHM action in this codebase carries.
+
+Full suite (2,014 tests, up from 2,009) and `pint --test` both clean. Live-verified: reloaded
+panel.dev.knj.network's PHP Manager page post-deploy and confirmed the corrected "one shared process
+per account" copy is live.
+
+A further re-audit round against this fix set is in progress before any version bump or release cut.
