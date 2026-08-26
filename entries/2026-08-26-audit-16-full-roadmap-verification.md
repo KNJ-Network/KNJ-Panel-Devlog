@@ -679,3 +679,118 @@ rounds six through fourteen's roadmap-row sweep: a bug-class-organized pass acro
 uncaught-exception gaps, transaction completeness, authorization/IDOR, injection surfaces, stuck-job/
 non-terminal-state bugs — each scanning every file that shape could apply to, not a slice of roadmap rows.
 The codebase isn't considered launch-ready until that comes back clean too.
+
+## Round sixteen — the methodology change, run for real
+
+Round fifteen's own finding — that this audit's rounds six through fourteen had one detection technique
+and were structurally blind to a whole other bug class — got exactly the response it called for: a fresh
+sweep organized by bug class across the *entire* `app/` tree, not a roadmap-row slice, and not reusing the
+create/delete-sibling technique that had already been driven clean and independently reconfirmed. Seven
+parallel agents, each assigned one bug class with no overlap: uncaught-exception gaps (the class round
+fifteen found), stuck-job/non-terminal-state bugs, race conditions/concurrency, injection surfaces
+(command/SQL/path), authorization/IDOR on both the account+API side and the WHM admin/reseller side, and
+general logic errors (off-by-one, dead code, copy-paste bugs).
+
+Two of the seven came back completely clean — a genuinely reassuring result, not a shallow one. Both
+authorization/IDOR passes independently re-derived the entire permission model from current code (not
+trusting any prior audit's verdict) and found nothing: every account/API controller scopes resources to
+the authenticated account, every WHM/reseller action enforces the right granular permission, the
+suspended-actor-still-acting class fixed back in audit #07 is still correctly enforced. Injection surfaces
+came back clean too — no command injection (every `Process::run()` call uses the array form, no raw
+`exec`/`shell_exec`/backticks anywhere), no SQL injection (the four raw-SQL call sites in the whole
+codebase are all parameter-bound or fully static). One informational note fell out of the WHM-side pass:
+it expected to find a literal "Terminal" command-runner controller and couldn't — checked against
+`docs/roadmap.md`, this was a deliberate scope decision from early on, shipped as **Diagnostics** instead
+(a real command-execution terminal was rejected as too high a compromise-blast-radius for a web app), not
+a gap.
+
+The other five passes found real, substantive bugs — confirming the methodology change was the right call,
+not a formality. In severity order:
+
+**cPanel import's tar extraction had no symlink guard — a real cross-tenant RCE.** Directly verified,
+not just agent-reported: `CpanelImportService::validateAndExtract()` checked every archive member's
+*name* (rejecting absolute paths, `../` segments, an allowlisted top-level directory) but never its
+*type*. A crafted `.tar.gz` containing a symlink member (e.g. named `homedir` → another customer's
+`public_html`) followed by an ordinary-looking regular-file member written through it lands outside the
+staging directory entirely, on a completely different hosting account's live web root. Reachable from the
+self-service, non-admin "Restore from cPanel Backup" upload — any customer could plant a webshell on
+another customer's site. Every *other* tar extraction in this codebase already has this exact guard via
+the privileged provisioning script's `validate_tar_archive_safe()`; this one PHP-side, unprivileged
+extraction (which runs *before* any privileged script touches the archive) was simply never brought in
+line. Fixed with a PHP-side equivalent: list the archive with `tar tvf` and reject any symlink or
+hard-link member before ever calling `tar xzf`.
+
+**Webmail's own pagination silently drops a message on every page turned.** `ImapMailboxClient::
+listMessages()` over-fetched by one row (`limit($perPage + 1, $page)`) as a cheap trick to detect whether
+a next page exists — but the underlying library (`webklex/php-imap`) reuses that same inflated count as
+the page-size multiplier for its own offset math, not just the fetch count. Page 2 of a 100-message inbox
+silently starts one message late, page 3 two messages late, permanently — no error, no warning, in the
+panel's own flagship webmail client. Fixed by fetching exactly `$perPage` messages at the correct offset
+and determining "has more" from a separate, cheap total-count check instead of the overfetch trick.
+
+**Account backup/restore was the one privileged operation in this codebase that never went through a
+queue — and had zero concurrency guard.** Every other long-running privileged action here is dispatched
+as a queued job with an "already running" gate; backup/restore ran synchronously in the web request
+instead, so two near-simultaneous requests for the same account (a double-click, two open tabs)
+genuinely raced across two php-fpm workers. Worse, the backup destination path only had 1-second
+resolution, so two clicks in the same second wrote into the *identical* directory — two independent
+tar/mysqldump processes corrupting each other's output while the row still got marked `Completed`. Fixed
+with a per-account `Cache::lock` (sized to each operation's real `Process` timeout, not a copy-pasted
+number) around backup/restore/restorePath, plus a random path suffix as defense in depth against the
+underlying collision even if the lock were ever bypassed.
+
+**The exact bug class round fifteen found — uncaught `Process::timeout()` exceptions leaving a run
+stuck in a non-terminal status forever — turned out to be systemic, not a one-off.** The dedicated sweep
+found 9 more instances: MariaDB upgrade/snapshot/restore (whose stuck-Running gate covers all three
+actions together, so a stuck upgrade could have blocked the admin's own recovery path — restoring the
+pre-upgrade snapshot), the OS package manager, the panel's own self-update mechanism, PHP extension
+toggling, system package updates, WAF engine install/ruleset-update, both cPanel/account-import paths
+(new-account and into-existing-account, each also leaking its staging directory on throw), Git Deploy,
+and the panel's own TLS certificate issuance. All fixed with the identical `try/catch(Throwable)`-mark-
+Failed-rethrow shape established in round fifteen. `AccountProvisioningService::issueSsl()` got one
+high-leverage fix instead of three: it's called from three separate jobs that already correctly branch on
+its boolean return value, so catching the timeout inside `issueSsl()` itself and returning `false`
+(matching its own existing "false on failure" contract) fixed all three downstream call sites — one of
+which, `ConvertAddonDomainJob`, would otherwise have left `AddonDomainConversion.status` stuck at
+`Running` forever even though the underlying account conversion had already fully succeeded — without
+touching any of the three job files.
+
+**A structural gap sits underneath all of the above and wasn't fixed this round: nothing protects
+against a hard queue-worker kill.** A job's own declared timeout is enforced by the queue worker killing
+the process via signal, which bypasses every `try/catch` no matter how well-placed — the same is true of
+an OOM kill or a `systemctl restart` mid-job. Today exactly one of roughly eighteen "Run"-shaped models
+in this codebase has a self-healing sweep for this (`SubscriberCampaign`, via the existing
+`ResumeStuckSubscriberCampaigns` command). This is a real design decision — a generalized reconciliation
+sweep, not a mechanical fix — and is being deliberately held for a follow-up round rather than built
+unilaterally.
+
+**Three more concurrency races, and a batch of "friendly error instead of raw 500" fixes, rounded out
+the sweep.** `DnsZoneService::restoreDefaultRecords()`/`ensureMailAuthRecords()`/`importRecords()` had
+the identical unlocked-check-then-insert race as the backup fix above — no DB unique constraint backs
+`dns_records`, so a plain double-click on "Restore Default Records" could write duplicate SPF/DMARC/NS
+records (a duplicate SPF TXT record causes a real RFC 7208 `permerror`, a silent deliverability
+regression, not just a cosmetic dupe) — fixed with the same per-zone lock pattern. The Git Deploy webhook
+endpoint had the exact race its sibling `deployNow()` button was already fixed for, just never applied to
+the public, token-authenticated webhook path — worse there since GitHub/GitLab/Bitbucket routinely
+deliver duplicate webhook events; now shares the same lock key so both serialize against each other.
+Subscriber campaigns' manual-paste and CSV-upload recipient sources deduped independently of each other,
+so the same email present in both got double-emailed and double-counted — now deduped across both
+sources. And five services (`WebdavAccountService`, `SubdomainService`, `AppInstallerService`,
+`FtpAccountService`, `DatabaseManagerService`'s `createDatabase()`/`createUser()`/`allowRemoteHost()`) had
+a real unique DB constraint already backstopping a create-race, but surfaced the losing request's
+`QueryException` as a raw 500 instead of a friendly error — now caught and converted, with
+`allowRemoteHost()`'s catch additionally attempting a best-effort revoke of the just-added MySQL grant so
+a lost race doesn't leave an orphaned, invisible grant behind.
+
+Full suite now at 2,191 tests (up from 2,153), `pint --test` clean. Live-verified: deployed commit
+confirmed live on `panel.dev.knj.network` via direct SSH check of `/srv/panel`'s HEAD against the pushed
+commit, queue worker confirmed restarted fresh and running the new code.
+
+```
+round:    initial  6   7   8   9  10  11  12  13  14  15  16
+findings:   many   4  ~30  9  13  13   5   2   2   0   2  ~20
+```
+
+Round sixteen's count jumping back up after round fourteen's zero isn't a regression in the codebase —
+it's the audit finally looking somewhere it never had before. The next round returns to confirmation
+mode against this fix set, plus the held-open resume-sweep design decision above.
