@@ -588,3 +588,46 @@ Full suite now at 2,153 tests (up from 2,152), `pint --test` clean. Live-verifie
 on panel.dev.knj.network post-deploy, loads clean with no errors.
 
 A fourteenth re-audit round against this fix set is next before any version bump or release cut.
+
+## Re-audit: round fourteen — clean
+
+Round fourteen came back with zero findings across all seven batches. Every item independently
+re-derived from current code, not from any prior round's verdict — including a full fresh-eyes second
+pass on "KNJ Webmail (custom client)" (nothing new since its first real audit last round) and explicit
+re-verification, with the actual test suites re-run rather than trusted from a summary, of both of round
+thirteen's fixes: `DnsZoneService::createZoneForSite()`'s transaction wrap (confirmed `dnsOnlySync
+->pushToAll()` is structurally unreachable on a rollback, since it sits after the `DB::transaction()`
+call returns and a rollback rethrows) and the Dovecot 2.4 template's suspended-filter/quota_rule fields
+(confirmed field-for-field identical to the 2.3 template and the Mail Only satellite push).
+
+This is the first fully clean pass since this audit began — thirteen re-audit rounds after the initial
+sweep, each one narrower than the last:
+
+```
+round:    initial  6   7   8   9  10  11  12  13  14
+findings:   many   4  ~30  9  13  13   5   2   2   0
+```
+
+## What this audit was, end to end
+
+Started as a check on whether every roadmap row marked "Live" on the public site was actually, truly
+shipped — not from memory, from the real code, file and line, batch by batch. Found the single worst bug
+of the whole run almost immediately (WebDAV's shared-htpasswd-file scoping gap, a real fail-open), then
+kept finding smaller instances of the same underlying pattern — a privileged provisioning-script or DNS
+write committed to the database *before* confirming it actually succeeded, with no rollback — spread
+across dozens of otherwise-unrelated features, because the codebase had grown that convention gradually
+rather than having it enforced everywhere from day one. The technique that found the long tail of
+these — compare every "create"/"enable" action's already-fixed shape against its "delete"/"disable"
+sibling, which had usually been overlooked — only crystallized partway through (round nine or so) and,
+applied systematically afterward, is what actually closed this out rather than an ever-growing list.
+
+Two genuinely severe findings stand out from the rest: `FirewallService::remove()` (round eleven) was
+the one instance across the whole audit where the bug direction was reversed — every other case *oversold*
+protection that had silently failed; this one *undersold* it, deleting a firewall rule from the database
+before confirming the real `ufw` sync succeeded, so a failed sync left the panel showing an IP as blocked
+while the live firewall still let it through. And the Dovecot 2.4 template gap (round thirteen) — a
+deploy-script bug invisible to the PHP test suite entirely, where a suspended mailbox could still
+authenticate and no quota was ever enforced on any Main install running the newer Dovecot generation.
+
+Full suite: 2,153 tests, all green. `pint --test`: clean. `panel-dev` confirmed clean and ready to serve
+as the source for a new production release.
