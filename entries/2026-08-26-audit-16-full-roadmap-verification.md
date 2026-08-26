@@ -342,4 +342,61 @@ confirming its own slice of tests passed before handing back. Full suite (2,081 
 and `pint --test` both clean after merging all five. Live-verified: reloaded the Mail Relay and WAF
 settings pages on panel.dev.knj.network post-deploy, both load clean with no errors.
 
-An eighth re-audit round against this fix set is in progress before any version bump or release cut.
+## Re-audit: round eight
+
+The eighth round of the 7-agent audit re-verified all of round seven's ~30 fixes (every one confirmed
+genuinely correct, with real fake-failure tests) but also found that the same persist-before-script-
+success bug pattern was still present, unfixed, in a family of mail services that call
+`AuthMapService::regenerate()`/`ensureInfra()` rather than a direct `scriptRunner->run()` call — a
+slightly different shape that round seven's targeted greps missed entirely. This mattered specifically
+for installs with a linked Mail Only satellite server: a failed push there could leave the panel's own
+database out of sync with what the satellite mail server was actually enforcing.
+
+Affected: 7 of `MailboxService`'s 8 mutating methods (`createMailbox`, `deleteMailbox`,
+`changePassword`, `updateQuota`, `suspend`, `unsuspend`, `deleteForwarder` — only `createForwarder`
+had already been fixed, in round seven), `DefaultAddressService::setCatchAll()`/`clearCatchAll()`,
+all four of `MailingListService`'s mutators, and `MailFilterService`'s blocklist methods (whose second,
+enforcement-rebuilding script call could fail after the first had already succeeded). All wrapped in
+`DB::transaction()`, since in every case the `regenerate()`/`apply()` call reads the row being written
+and can't simply run first. Two related gaps closed alongside: `MailController::suspendMailbox()`/
+`unsuspendMailbox()` and its bulk-forwarder-import loop had no try/catch at all around calls that can
+now throw — a satellite-push failure was an uncaught 500 (or aborted the whole CSV batch) rather than a
+flashed error or a skip-and-continue; same gap found and fixed in
+`DefaultAddressController::destroy()` while wrapping up this fix wave.
+
+Four more instances of the same underlying anti-pattern turned up outside the mail-auth-map family,
+in services round seven's sweep never reached:
+
+- **`DirectoryPrivacyService::protect()` — the most serious of the four.** It created the DB row and
+  wrote the htpasswd file *before* the privileged nginx-config sync confirmed success. A failed sync
+  left a phantom "protected" row: the account owner's UI said the directory was password-protected
+  when nginx had never actually been told to enforce it — a real fail-open security gap, not just
+  stale-looking UI. Fixed with the same rollback-on-failure shape `WebdavAccountService::create()`
+  already used (delete the row, unlink the htpasswd entry, on sync failure).
+- `DatabaseManagerService::allowRemoteHost()` — same shape but fail-closed (a failed firewall sync
+  just means the port never actually opens), fixed the same way.
+- `CronJobService::updateCronEmail()` had been missed when `create()`/`delete()` got the
+  `DB::transaction()` treatment in round seven; `CronJobController::updateEmail()` had no try/catch
+  either, so a failed sync was both an uncaught 500 and a silently-wrong `cron_email` in the database.
+- `QuickSiteService::publish()` persisted the `QuickSite` row without ever checking whether
+  `file_put_contents()` actually succeeded — fixed by checking the write first and throwing before any
+  DB write on failure.
+
+Two smaller, related UX gaps in `AccountController` were fixed alongside rather than left for a future
+round: a failed disk-quota re-application on package change was only `report()`'d (logged) and never
+shown to the admin, who'd see "Account updated." even though enforcement hadn't actually changed —
+now flashes an error too, without blocking the metadata update itself; and `suspend()`/`unsuspend()`
+had no try/catch around their provisioning calls, so a script failure was a raw 500 instead of a
+graceful redirect.
+
+One subtle bug surfaced while building the `MailFilterService` fix: `Setting::get()`'s
+`Cache::rememberForever()` isn't transaction-aware, so wrapping a `Setting::set()` plus a call that
+reads that same setting inside one `DB::transaction()` meant a rollback reverted the database row but
+left the cache still holding the new, never-committed value. Fixed with an explicit `Cache::forget()`
+in the catch block for the two methods this affected.
+
+Two fix agents split the ~10 remaining files with no overlap. Full suite (2,108 tests, up from 2,081)
+and `pint --test` both clean. Live-verified: reloaded the Default Address and Directory Privacy pages
+on panel.dev.knj.network post-deploy, both load clean with no errors.
+
+A ninth re-audit round against this fix set is in progress before any version bump or release cut.
