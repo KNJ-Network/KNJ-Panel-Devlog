@@ -146,3 +146,48 @@ panel.dev.knj.network's PHP Manager page post-deploy and confirmed the corrected
 per account" copy is live.
 
 A further re-audit round against this fix set is in progress before any version bump or release cut.
+
+## Re-audit: round three
+
+The same seven-way independent check ran again, fresh, against round two's deployed fixes. It found
+two more real bugs, four more stale roadmap lines, and one more coverage gap — nothing left unfound
+from the first two rounds, but each round's own fixes opened a small new surface the next round
+caught.
+
+**The account-wide PHP version fix was still incomplete — new sites didn't inherit it.** Round two
+fixed `setSiteVersion()` to keep every *existing* site on an account in sync with the one real shared
+FPM pool. What it didn't cover: a *new* addon domain or subdomain added after an account had already
+switched away from the default version. `DomainsController::store()` and `SubdomainService::create()`
+both built the new `Site` row with `php_version_id` left null — "inherit/default" — even on an account
+already pinned to something else. No functional outage (the shared pool still serves the new site
+correctly either way), but the new site's own database row, and both the WHM and account-side PHP
+selectors reading it, would misreport the version actually in use. Fixed by having both creation paths
+inherit whatever the account's existing sites are already pinned to, rather than defaulting to null.
+
+**The MariaDB upgrade snapshot was never actually mandatory.** The upgrade page has always described
+its pre-upgrade snapshot as "mandatory" — in the roadmap copy and in the confirm dialog — but nothing
+in `DatabaseUpgradeController::apply()` enforced it. An admin could trigger a major-version upgrade
+with zero completed snapshots on record, meaning no rollback path in place despite what the UI
+promised. Fixed by having `apply()` actually require a completed snapshot to exist before dispatching
+the upgrade job.
+
+**Four more roadmap lines had drifted.** "Server-wide settings" still pointed contact/notification
+emails at the Server Setup page after they moved to the dedicated Notifications page. The client-side
+"Per-domain mail routing" note claimed an admin could configure routing for any domain from the
+Controller side — no such action, controller, or view exists anywhere in the codebase; only the
+admin-side row (fixed in round two) needed that disclosure, this client-side row had the same false
+claim independently. "Directory listing style" implied a choice between multiple listing styles when
+the feature is a plain per-folder on/off toggle. "WebDAV access" claimed every account gets a
+full-access WebDAV login created automatically — it's 100% self-service; nothing is auto-provisioned,
+the owner creates each login themselves.
+
+**One more coverage gap**: Directory password protection has real cross-account ownership checks
+(`ensureOwnsProtection()`) and a real nginx-injection charset guard on the protected path (from audit
+#11), but neither had a test proving it. Added cross-account tests for unprotect/add-user/remove-user,
+and a regression test for the injection guard using the exact kind of folder name (`evil'} location
+/x {alias /etc;} location /{y`) the guard exists to reject.
+
+Full suite (2,022 tests, up from 2,014) and `pint --test` both clean. Live-verified: reloaded the
+Database Upgrade page on panel.dev.knj.network post-deploy, loads clean with no errors.
+
+A fourth re-audit round against this fix set is in progress before any version bump or release cut.
