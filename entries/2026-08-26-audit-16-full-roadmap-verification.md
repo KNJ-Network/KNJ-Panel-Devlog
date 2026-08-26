@@ -793,4 +793,60 @@ findings:   many   4  ~30  9  13  13   5   2   2   0   2  ~20
 
 Round sixteen's count jumping back up after round fourteen's zero isn't a regression in the codebase —
 it's the audit finally looking somewhere it never had before. The next round returns to confirmation
-mode against this fix set, plus the held-open resume-sweep design decision above.
+mode against this fix set.
+
+## Round sixteen — closing the held-open gap: a generalized stuck-run sweep
+
+The one item deliberately held open above — nothing defends against a *hard* queue-worker kill (the
+job's own timeout enforced via signal, an OOM kill, or `systemctl restart knjpanel-queue` landing
+mid-job, which the deploy pipeline itself triggers on every push) — got built the same day. Every
+try/catch fix above only closes the *throwing*-failure path; a hard kill bypasses all of them
+regardless of placement, since the process is terminated before any PHP code, including a catch
+block, can run.
+
+Researched first rather than guessed: read every job class's own declared `$timeout` (`app/Jobs/*.php`
+consistently declares one — `MariadbUpgradeRun`'s three jobs at 630s, `PanelUpdateRun`/`SystemUpdateRun`
+at 1830s, `WafInstallRun` at up to 3900s, and so on) and every "Run"-shaped model's schema (all share
+the same `status`/`started_at`/`completed_at` shape, backed by an enum whose `Running`/`Failed` cases
+share the identical string values across every enum in this codebase — `SystemUpdateRunStatus`,
+`WafInstallRunStatus`, `BackupStatus`), before designing the fix — a wrong threshold either fires on a
+genuinely-still-running operation or leaves a truly stuck one undetected for too long.
+
+New scheduled command, `knjpanel:resume-stuck-system-runs` (every 5 minutes, matching
+`CheckServerHealth`/`CheckWafHealth`'s own cadence), generalizes the one prior precedent for this
+class of problem — `ResumeStuckSubscriberCampaigns`, which *re-dispatches* a fresh job because a
+campaign send is safely resumable (it only ever acts on rows still `queued`) — to a dozen other models
+that aren't safely resumable the same way: MariaDB upgrade/snapshot/restore, panel self-update, system
+package updates, WAF engine install/ruleset-update, OS package install, PHP extension toggle, Git
+Deploy, both cPanel/account import paths (with their staging directories cleaned up too, closing the
+same leak round fifteen's uncaught-exception fixes already closed for the *throwing* path), and account
+backup/restore. None of these can just be resumed from wherever they left off, so the sweep's job is
+narrower: mark the stuck row `Failed` — exactly what its own try/catch would already have done had the
+process lived long enough to reach it — clearing the "already running" gate every one of these
+controllers checks, and alert an admin via the existing `AdminAlertService`/webhook channel (a new
+`job.stuck` event, a new `notify_on_stuck_job` toggle on the Notifications page, following the exact
+pattern already used for `waf.degraded`/`backup.failed`/`server.unreachable`) so a stuck operation
+doesn't go unnoticed the way every one of these did before this sweep existed.
+
+**`AppInstallation` is deliberately excluded**, and the reasoning is worth recording since it's the one
+place this sweep intentionally does *less* than it could: every other model here can be blind-flipped
+to `Failed` safely because that's exactly what its own try/catch already does on a normal failure.
+`AppInstallerService::runInstall()` is different — on a normal failure it doesn't just flip a status,
+it *rolls back* (deletes the database user and database it created, tears down what it wrote). A hard
+kill mid-install could leave those same resources half-created with no rollback ever having run; a
+blind status flip here would leave them permanently orphaned and invisible, worse than leaving the row
+alone. That needs bespoke, install-aware reconciliation this sweep doesn't attempt — tracked
+separately, not silently skipped.
+
+Six new tests (`ResumeStuckSystemRunsTest`) cover: a genuinely stuck run being marked Failed with an
+admin alert sent, a run still within its own timeout being left alone (no false positives), staging-
+directory cleanup actually running, a second model type (Git Deploy) confirming the sweep generalizes
+correctly rather than being hardcoded to one shape, `AppInstallation` provably being left untouched, and
+no alert firing when nothing is stuck. Full suite now at 2,197 tests (up from 2,191), `pint --test`
+clean. Live-verified: deployed commit confirmed live via SSH, and `php artisan schedule:list` on
+`panel.dev.knj.network` confirms the new command is correctly registered and due to run within 5
+minutes, alongside the existing subscriber-campaign sweep it was modeled on.
+
+This closes every item raised by round fifteen's own methodology critique. The codebase is not being
+declared "launch-ready" from this alone — round fifteen also called for confirmation rounds against
+each fix set, which continue from here.
