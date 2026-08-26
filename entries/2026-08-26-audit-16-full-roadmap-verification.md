@@ -191,3 +191,39 @@ Full suite (2,022 tests, up from 2,014) and `pint --test` both clean. Live-verif
 Database Upgrade page on panel.dev.knj.network post-deploy, loads clean with no errors.
 
 A fourth re-audit round against this fix set is in progress before any version bump or release cut.
+
+## Re-audit: round four
+
+The same seven-way check ran a third time against round three's deployed fixes. It came back with
+three findings — two real bugs and one deliberate design choice made visible rather than fixed.
+
+**Blocked sender domains raced Mail Settings, same shape as the recipient bug fixed in the very first
+pass.** `mail-filter-domains-write` set `smtpd_sender_restrictions` directly from the provisioning
+script, instead of only writing the map file and letting `MailServerSettingsService::apply()` own the
+directive — meaning a domain-block save could silently overwrite whatever the last Mail
+Settings/Greylisting/Spam Filter save had composed, dropping `permit_mynetworks`/
+`permit_sasl_authenticated` or an enabled `reject_unknown_sender_domain`. Fixed by mirroring the
+recipient path exactly: the script only writes and postmaps the map file now, and
+`MailFilterService::updateBlockedDomains()` calls `apply()` immediately after, which now also composes
+`check_sender_access` into `smtpd_sender_restrictions` when domains are blocked.
+
+**Convert Addon Domain to Account carried over a stale PHP version.** The provisioning script's new
+FPM pool for the converted account is always created at the hardcoded system default version
+(`FPM_POOL_DIR="/etc/php/8.5/fpm/pool.d"`) — never at whatever the addon site happened to be pinned to
+on the old account. A site previously switched to a non-default PHP version would convert into a new
+account whose database row kept claiming that version, while the real pool serving it was always the
+default. Fixed by resetting the new primary site's `php_version_id` to null on conversion, matching
+what's actually provisioned.
+
+**The mandatory snapshot gate (round three) checks existence, not freshness — made visible, not
+force-fixed.** A snapshot from months ago satisfies the same "does one exist" check as one from five
+minutes ago. Rather than invent an arbitrary age cutoff and block on it, added a non-blocking amber
+warning on the Database Upgrade page when the most recent snapshot is 24+ hours old, so staleness is
+visible to the admin deciding whether to snapshot again before a real upgrade — the actual judgment
+call stays with them.
+
+Full suite (2,026 tests, up from 2,022) and `pint --test` both clean. Live-verified: reloaded the
+Database Upgrade page on panel.dev.knj.network post-deploy and confirmed the new staleness warning
+renders correctly against the real week-old snapshot already on that box.
+
+A fifth re-audit round against this fix set is in progress before any version bump or release cut.
