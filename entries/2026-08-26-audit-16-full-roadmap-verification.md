@@ -399,4 +399,47 @@ Two fix agents split the ~10 remaining files with no overlap. Full suite (2,108 
 and `pint --test` both clean. Live-verified: reloaded the Default Address and Directory Privacy pages
 on panel.dev.knj.network post-deploy, both load clean with no errors.
 
-A ninth re-audit round against this fix set is in progress before any version bump or release cut.
+## Re-audit: round nine
+
+The ninth round found the same "persist before confirming a privileged action succeeded" bug had two
+more forms nobody had caught yet, plus a batch of smaller uncaught-exception gaps discovered by
+cross-referencing each fixed controller against its unfixed sibling.
+
+**`GreylistingService` had the identical bug already fixed for `MailFilterService`, but was itself
+missed.** Both persist a Setting, then make a second privileged script call that rebuilds Postfix's
+`smtpd_recipient_restrictions` directive — if that second call fails, the Setting stays "new" with
+nothing to roll it back. `MailFilterService` got this fixed correctly in round eight (`DB::transaction`
++ an explicit `Cache::forget()`, since `Setting::get()`'s forever-cache isn't transaction-aware);
+`GreylistingService` has the exact same shape and was never touched. Fixed identically.
+
+**The entire admin DNS Zone Manager subsystem had never received this treatment at all** — a whole
+feature area every prior round missed, because its privileged action (`writeZone()`, BIND validation
++ write) is structurally different from the `scriptRunner->run()`/`AuthMapService::regenerate()`
+shapes every earlier fix targeted. `DnsController`'s `store()`/`update()`/`destroy()`/`bulkUpdate()`,
+`DnsZoneService`'s `restoreDefaultRecords()` and `importRecords()`, and `DnsClusterService`'s
+`generateKeyFor()` all wrote a DnsRecord (or, for the cluster case, a TSIG key onto the Server row)
+before confirming the write actually landed in BIND, with no rollback — and this drift is invisible to
+the existing "Missing Zones" repair tool, which by its own doc comment only detects a zone being
+entirely absent, not content drift within one that still exists. All five wrapped in `DB::transaction()`,
+mirroring the account-side `DnsController`'s own already-correct shape.
+
+The worst instance was `backfillMailAuth()` (used by "Bulk-enable mail signing"): it didn't even catch
+the exception at all, so one zone failing mid-batch was an uncaught 500 with every earlier zone in the
+batch already committed. It now wraps each zone's backfill in its own transaction and try/catch and
+reports "N updated, M failed" instead of either silently succeeding or crashing the whole request.
+
+Four more gaps were found the same way this whole audit keeps finding them — reading a fixed
+controller next to its unfixed twin: `HotlinkProtectionController::destroy()` was the one sibling of
+Directory Listing/Custom Error Pages/MIME Types/Leech/IP Blocker's `destroy()` actions that never got
+the `catch (FileManagerException|RuntimeException)` treatment; the admin-side
+`SystemCronJobController::destroy()`/`updateEmail()` never got the fix its account-side sibling
+`CronJobController` already had; and `SecurityScanController::run()` and `SslController::generateCsr()`
+both call something that can throw with no catch at all, each now redirecting with a flashed error
+instead of a raw 500.
+
+Two fix agents split the files with no overlap — 21 files, 5 real bugs plus 4 missing-catch gaps, 15
+new regression tests. Full suite (2,123 tests, up from 2,108) and `pint --test` both clean. Live-verified:
+reloaded the Greylisting and Zone Templates pages on panel.dev.knj.network post-deploy, both load clean
+with no errors.
+
+A tenth re-audit round against this fix set is in progress before any version bump or release cut.
