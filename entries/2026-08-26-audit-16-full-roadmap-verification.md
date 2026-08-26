@@ -442,4 +442,43 @@ new regression tests. Full suite (2,123 tests, up from 2,108) and `pint --test` 
 reloaded the Greylisting and Zone Templates pages on panel.dev.knj.network post-deploy, both load clean
 with no errors.
 
-A tenth re-audit round against this fix set is in progress before any version bump or release cut.
+## Re-audit: round ten
+
+By round ten, the audit had converged on a specific, repeatable technique for finding the last of these
+bugs: for every feature, compare its already-fixed "create"/"store" action against its "delete"/
+"destroy" sibling — repeatedly, the create side had been fixed in an earlier round while the delete side,
+same file, same shape, was simply never checked. Every finding this round came from that one comparison,
+applied systematically across the whole codebase.
+
+**Missing try/catch** (an uncaught `RuntimeException` on a privileged-script failure, where the sibling
+action already had one): `SslController::generateCsr()` on the account side — the customer-facing twin
+of the WHM controller fixed in round nine, missed entirely; `MailController::destroyForwarder()`,
+missing what `destroyMailbox()` in the same file already had; `MailingListController::destroy()`/
+`destroyMember()`, missing what `store()`/`storeMember()` already had; `DynamicDnsController::destroy()`;
+`QuickSiteController::store()`/`destroy()`; `ProcessMonitorController::index()`, missing the graceful-
+degradation pattern `MailQueueController`/`MailDeliveryController`/`MailStatisticsController` already
+used for the identical "render live external-command data" shape; and `BackupHistoryController::browse()`
+/`BackupController::browse()`, missing what their own sibling `restore`/`export` actions in the very same
+files already had.
+
+**Wrong-order persist-then-verify** (the delete/revoke path doing the opposite of its own already-fixed
+create/approve path — deleting first, confirming the privileged write second): `ChallengeResponseService::
+revoke()` (opposite of `approve()`/`setEnabled()`), `QuickSiteService::unpublish()` (opposite of
+`publish()`), `DirectoryPrivacyService::unprotect()` (opposite of `protect()`), `WebdavAccountService::
+delete()` (opposite of `create()`), and account-side `DnsController::bulkUpdate()` — missing the
+`DB::transaction()` wrap its own `store()`/`update()`/`destroy()` in the same file already had.
+
+Two more turned up in `ServerController`, both in the DNS-clustering TSIG-key flow: `completeLink()`
+persisted the newly-linked hostname/IP/status before confirming `regenerateClusterConfig()` succeeded —
+fixed the same way `DnsClusterService::generateKeyFor()` was in round nine, wrapping both in one
+transaction. `destroy()` had the identical ordering issue, but removing a server is a genuine,
+non-reversible admin action — rolling back the deletion because a config-regenerate afterward failed
+would be wrong. Instead it now lets the deletion stand and flashes a warning if the regenerate fails,
+the same "let the primary action succeed, surface a warning for the best-effort secondary one" shape
+`AccountController::update()`'s quota-reapply fix used in round nine.
+
+Two fix agents split the 13 findings across ~33 files with no overlap. Full suite (2,141 tests, up from
+2,123) and `pint --test` both clean. Live-verified: reloaded the Resource Monitor and Servers pages on
+panel.dev.knj.network post-deploy, both load clean with no errors.
+
+An eleventh re-audit round against this fix set is in progress before any version bump or release cut.
