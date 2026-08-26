@@ -248,3 +248,36 @@ tests exactly.
 Full suite (2,028 tests, up from 2,026) and `pint --test` both clean.
 
 A sixth re-audit round against this fix set is in progress before any version bump or release cut.
+
+## Re-audit: round six
+
+Five findings this round — the two real bugs of a new class this audit hadn't caught before, two
+private-doc scope overclaims, and one more test-coverage gap.
+
+**Two admin settings pages could silently drift from what the server actually had applied.**
+`EmailArchivingService::update()` and `DatabaseConfigService::update()` both persisted the admin's
+chosen values to `Setting` *before* confirming the privileged provisioning-script call had actually
+succeeded. A failed write — Postfix's bcc-maps config for archiving, my.cnf for database tuning —
+still left the WHM page reporting the new values as current, even though nothing on the live server
+had changed. This is the exact bug class audit #15 already fixed once for `ClamavService`, and this
+session's earlier rounds fixed again for `TlsPolicyService` — both now follow that same
+persist-only-after-success order, with regression tests proving Settings stay unchanged when the
+script call fails.
+
+**Two private roadmap.md claims overstated scope the code never had.** IP Blocker and Optimize
+Website were both documented as covering "any of the account's sites" / "per-domain," but both
+services only ever write their nginx directive into the primary domain's vhost — the same
+account-wide-only scope already established (and already disclosed) for Directory Listing, Custom
+Error Pages, and Custom MIME Types elsewhere in this same document. Corrected the copy to match, and
+fixed the matching public roadmap.json overclaim for Website compression's description.
+
+**The Nameserver Report's reseller scoping had real code but no test proving it.** The scoping logic
+in `DnsController::nameserverReport()` was already correct and had been for a while, but the only
+reseller-related test on this page checked that a plain account user gets 403 — never that a reseller
+genuinely only sees their own domains, unlike the sibling Deliverability feature's own test of this
+exact scoping. Added the matching test.
+
+Full suite (2,030 tests, up from 2,028) and `pint --test` both clean. Live-verified: reloaded the
+Email Archiving page on panel.dev.knj.network post-deploy, loads clean with no errors.
+
+A seventh re-audit round against this fix set is in progress before any version bump or release cut.
