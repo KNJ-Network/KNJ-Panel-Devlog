@@ -630,4 +630,52 @@ deploy-script bug invisible to the PHP test suite entirely, where a suspended ma
 authenticate and no quota was ever enforced on any Main install running the newer Dovecot generation.
 
 Full suite: 2,153 tests, all green. `pint --test`: clean. `panel-dev` confirmed clean and ready to serve
-as the source for a new production release.
+as the source for a new production release. **v0.16.74 cut and published to `KNJ-Panel-Builds` from this
+confirmed-clean state.**
+
+## Re-audit: round fifteen — a different bug class, and why that matters
+
+One more confirmation pass was run after the v0.16.74 cut, on the same seven-way methodology as every
+round above. It found two more real bugs — both structurally different from every bug this audit had
+caught in the fourteen rounds before it.
+
+**Perl Module and PEAR Package installers left their run stuck in `Running` forever on a timeout.**
+`Process::timeout(120)->run(...)` in both `PerlModuleService::install()` and
+`PhpPearPackageService::install()` only had failure handling for an *unsuccessful result* — but a real
+timeout doesn't return an unsuccessful result, it throws `Illuminate\Process\Exceptions\
+ProcessTimedOutException`, skipping the failure-recording block entirely. The stuck run permanently
+blocked every future install of that type too, since the "already running" gate both controllers check
+is server-wide, not per-account. Fixed by wrapping both calls in `try/catch (Throwable)`, mirroring the
+shape `AppInstallerService::runInstall()` already used correctly.
+
+**New account provisioning never synced the new site's PHP version against the current default.**
+`PhpVersionService::setDefault()` only flips a DB flag — it has no effect on any live server state, by
+design, since the provisioning script's `FPM_POOL_DIR` is what actually determines which PHP a new pool
+gets built at, and that path is hardcoded to `8.5`. Currently latent (the seeded default happens to match
+the hardcoded value), but a real bug the moment an admin changes the default — every new account from
+then on would provision onto the old version while its database row and the admin's own dashboard
+reported the new one. Fixed by having `ProvisionAccountJob` best-effort sync the new site to the current
+default right after activation, reusing the same `PhpVersionService::setSiteVersion()` mechanism a manual
+PHP Selector switch already uses.
+
+Full suite now at 2,153 tests (unchanged — one new test file's assertions extended rather than a new
+file added), `pint --test` clean. Live-verified: deployed commit confirmed live on `panel.dev.knj.network`
+via direct SSH check of `/srv/panel`'s HEAD against the pushed commit, queue worker confirmed restarted
+cleanly by auto-deploy and running the new job signature.
+
+**Why this round matters more than its bug count suggests.** Both bugs belong to a class none of the
+prior fourteen rounds' technique could have found: an *uncaught exception bypassing failure-handling
+code entirely*, as opposed to code that runs to completion but writes state in the wrong order (the
+create/delete-sibling, persist-before-verify, missing-try-catch shapes that closed out rounds six through
+fourteen). A codebase can be completely clean by one detection technique and still hide bugs from a
+structurally different one. Two agents independently reviewing the same file (Perl Module installer) gave
+contradictory verdicts here — one saw a try/catch existed and called it fixed without checking what it
+actually caught; the other looked closer and found it was the wrong exception type entirely — a reminder
+that even within one technique, verification depth varies and disagreement between agents is a signal to
+dig deeper, not average out.
+
+This is the reason the next audit round is a genuine methodology change rather than another repeat of
+rounds six through fourteen's roadmap-row sweep: a bug-class-organized pass across the whole codebase —
+uncaught-exception gaps, transaction completeness, authorization/IDOR, injection surfaces, stuck-job/
+non-terminal-state bugs — each scanning every file that shape could apply to, not a slice of roadmap rows.
+The codebase isn't considered launch-ready until that comes back clean too.
