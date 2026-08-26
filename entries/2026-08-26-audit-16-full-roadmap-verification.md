@@ -850,3 +850,100 @@ minutes, alongside the existing subscriber-campaign sweep it was modeled on.
 This closes every item raised by round fifteen's own methodology critique. The codebase is not being
 declared "launch-ready" from this alone — round fifteen also called for confirmation rounds against
 each fix set, which continue from here.
+
+## Round seventeen — confirming the bug-class sweep, and its own blind spot
+
+The first confirmation pass against round sixteen's methodology change: the same seven bug classes,
+each re-derived fresh from current code rather than trusting round sixteen's verdicts. Both
+authorization/IDOR passes came back clean again, independently re-confirming the permission model with
+no new gaps. The other five classes found real issues — some new, one a gap in round sixteen's own new
+code, and one that exposed a structural limit in the technique itself.
+
+**The same "already running" check-then-act race round sixteen fixed once, in `GitDeployController`,
+had never been propagated to the 9 other controllers with the identical shape.** Every one of them
+follows the same pattern — check whether a run is already in progress, create the DB row, dispatch the
+job — with no lock between the check and the create, so two concurrent requests can both pass the
+check and both dispatch: `DatabaseUpgradeController` (snapshot/apply/restore, one shared lock, since
+the three are mutually exclusive on the same database), `WafController`, `SystemUpdateController` (two
+independent locks — panel updates and OS package updates don't need to exclude each other),
+`PackageManagerController`, `PerlModuleController`, `PhpExtensionController` on the WHM side, and
+`CpanelImportController`, `PhpPearPackagesController`, `PerlModulesController` on the account side.
+`PerlModuleController`/`PerlModulesController` deliberately share one lock key across the WHM/account
+boundary, since both write to the same global Perl module state. All nine wrapped in
+`Cache::lock()->block(5, ...)`, lock timeout left uncaught — matching the precedent
+`GitDeployWebhookController` already established for exactly this failure mode.
+
+**A cross-table duplicate race with zero DB backstop**: `mailboxes`, `mail_forwarders`, and
+`mailing_lists` share one namespace (a domain's local part can only mean one thing), but nothing
+enforced uniqueness *across* those three tables, only within each one. Two concurrent requests — a
+mailbox create and a mailing list create for the same address, or either against itself — could both
+succeed, leaving `admin@example.com` simultaneously a mailbox and a mailing list with undefined mail
+routing. `MailboxService::createMailbox()` and `MailingListService::createList()` now share one
+`Cache::lock("mail-local-part:{$site->id}:{$localPart}")` key, serializing the two against each other,
+plus a `QueryException`-to-friendly-error catch on the same-type case. `SubscriberService::subscribe()`
+got a `QueryException` retry rather than an error, since a double-submitted public subscribe form isn't
+really a failure — whichever request won already satisfies the caller's intent.
+
+**The 4-service mail auth-map family, and 6 more `sync()`-style methods, rebuilt a shared file from
+every DB row with no lock against a second concurrent trigger.** `MailAuthMapService`,
+`ForwarderAuthMapService`, `MailingListAuthMapService`, and `DefaultAddressAuthMapService` each
+regenerate their own file from scratch on every call; two overlapping regenerations risk a truncated or
+interleaved write, install-wide. Each got its own global lock, timeout left uncaught (matching this
+codebase's existing convention for from-scratch rebuilds). `IpBlockerService`, `CronJobService`,
+`WebdavAccountService`, `DirectoryPrivacyService`, `DirectoryIndexService`, and
+`DatabaseManagerService::syncRemoteAccessFirewall()` had the identical shape, one lock each. Three of
+these — `WebdavAccountService::create()`, `DirectoryPrivacyService::protect()`,
+`DatabaseManagerService`'s remote-access methods — call `sync()` from inside their own
+`try/catch(RuntimeException)` rollback block (not a `DB::transaction()`), so a raw, uncaught
+`LockTimeoutException` there would silently bypass that rollback and orphan rows/files/grants; those
+six convert the timeout to a friendly `RuntimeException` instead of leaving it raw, a deliberate,
+documented departure from the auth-map family's own convention right above it, made for that specific
+reason.
+
+**`servers.ip_address` had no DB constraint at all.** Two admins completing a server-link at the same
+moment could register two `Server` rows under the identical IP with no error from either request.
+Added a nullable-safe unique constraint, and wrapped `ServerController::completeLink()`'s create in a
+`QueryException` catch that returns a friendly error instead of a raw 500 to whichever request lost the
+race.
+
+**CalDAV/CardDAV's sync-collection `REPORT` could hand a client one row past the limit it asked for.**
+`AddressBookBackend`/`CalendarBackend::getChanges()` queried `limit() + 1` — dead code left over from a
+cursor/has-more pattern that was never actually wired up — and returned every row fetched, not just the
+requested count. Fixed by querying exactly the limit.
+
+**Round sixteen's own new sweep had a gap in its own model list.** `ResumeStuckSystemRuns`' 11-model
+`CONFIGS` array was missing `CpanelTransferRun`, a same-shaped Run model that existed before round
+sixteen shipped — added with the job's own timeout (3630s) plus the standard 120s buffer.
+`AddonDomainConversion` needed different treatment entirely: unlike every other model in the sweep, its
+remaining provisioning work (the `convert-addon-domain` script action) can't be safely re-run after a
+hard kill — its own guard clauses fail loudly on a second attempt, and the DB-side account/site
+re-parenting it depends on has no idempotent check either. A stuck conversion is now left completely
+untouched (no status flip) and raises a distinct, more urgent admin alert explicitly stating nothing
+was auto-changed, rather than either silently re-attempting unsafe work or blind-flipping a status that
+would hide a real half-finished conversion. The reused `job.stuck` webhook event's label was updated to
+cover both the auto-fail case and this alert-only case, since one event name now means either.
+
+**What this round's own findings say about the technique itself.** The create/delete-sibling and
+persist-before-verify techniques that closed out rounds six through fourteen, and the uncaught-exception
+technique round fifteen added, are both structurally blind to this round's biggest finding — the same
+race pattern copy-pasted across nine controllers is a *propagation* failure, not a shape a single-file
+review would catch, and only surfaced because this round's race-conditions pass re-derived every
+controller from scratch rather than checking whether the one already-fixed instance had a sibling.
+Round sixteen's resume-sweep, in turn, only defends against a *hard* kill bypassing every try/catch;
+this round found the sweep itself needed two more model entries, the same "was this fix actually
+propagated everywhere it should have been" question applied recursively to round sixteen's own new
+code. No further methodology gap is visible from here, but that was also true, at the time, after round
+fourteen's first clean pass.
+
+Full suite now at 2,230 tests (up from 2,197), `pint --test` clean. Live-verified: deployed commit
+confirmed live via SSH (`/srv/panel` HEAD matches the pushed commit), the new
+`servers_ip_address_unique` index confirmed present via a direct `SHOW INDEX` query, the
+`2026_08_26_090000_add_unique_constraint_to_servers_ip_address` migration confirmed `Ran`, and the
+queue worker confirmed restarted fresh by auto-deploy.
+
+```
+round:    initial  6   7   8   9  10  11  12  13  14  15  16  17
+findings:   many   4  ~30  9  13  13   5   2   2   0   2  ~20  ~15
+```
+
+A further confirmation round may follow if requested, same standing discipline as every round above.
