@@ -1388,3 +1388,70 @@ as Deleting under `Bus::fake()`" adjustment, plus new coverage in `AccountProvis
 `ResumeStuckSystemRunsTest`, and `AccountModifySuspendTest` for the new status transitions, the retry
 action, the double-deletion guard, the stuck-sweep, and the login block. Full suite now at 2,440 tests
 (up from 2,429), `pint --test` clean, deployed and live-verified via SSH on `panel-dev.knj.network`.
+
+## Round twenty-two — a session-limit interruption, and the smallest finding count yet
+
+Launched the same 8-category sweep the morning after closing the account-deletion gap. The session hit
+Anthropic's own usage limit partway through — 7 of the 8 category agents (and their internal sub-agents)
+failed mid-run with a session-limit error, arriving as a wave of near-simultaneous failure notifications.
+No code was left in a broken state (the sweep agents are read-only), so the only casualty was incomplete
+coverage: only the check-then-act lock-race category had finished before the limit hit, with one real,
+unfixed finding (`SslController::retry()`, in both the `Account` and `Whm` namespaces, missing the same
+lock `PhpVersionController::retry()` got in round twenty-one). Everything else paused until the limit
+reset a few hours later.
+
+On resume, the SSL retry fix went in first — same `Cache::lock("ssl-retry:{$site->id}", ...)` pattern as
+`PhpVersionController::retry()`, guarding against two near-simultaneous "Retry" clicks dispatching two
+overlapping certbot/ACME runs for the same site. One subtlety surfaced writing the regression test:
+`abort_if($condition, 404)` throws `NotFoundHttpException`, which — because Symfony's `HttpException`
+extends `\RuntimeException` — was getting silently swallowed by the account-side controller's own
+pre-existing `catch (RuntimeException $e)` (kept for an older regression test covering a failed job
+dispatch), turning a correct 404 into a misleading error redirect. Fixed by catching
+`HttpExceptionInterface` first and rethrowing, ahead of the broader `RuntimeException` catch.
+
+The remaining seven categories were then relaunched. Five came back clean — persist-before-verify across
+mail/DNS/DB services, security/files/software services, and controllers directly, plus DB-constraint
+create-race completeness (Laravel 13's `createOrFirst()` was confirmed, by reading the vendor source
+directly, to self-heal a losing race via savepoint-wrapped retry even where no app-level `catch` exists)
+— and IDOR/authorization came back clean for a fifth consecutive round, the strongest run yet for the
+category where a real bug would matter most. One of the seven relaunched agents (persist-before-verify
+security/files/software) hit round twenty-one's known "returns an interim non-answer instead of a final
+result" failure mode — it had fanned out its own sub-agents and stopped mid-wait rather than
+synthesizing; a follow-up message telling it to stop delegating and answer directly got a real final
+report on the second pass.
+
+Two more real findings came out of the two categories that weren't clean:
+
+**`NginxSettingsService`'s single shared-lock design had a read-outside-the-lock gap.** `apply()` locks
+only the write; three callers (`WafService::applyGlobalSettings()`, `InstallWafEngineJob`,
+`PanelCertService::issue()`) that rebuild the shared nginx snippet from *whatever's currently in
+Settings* — rather than a specific new value a form just submitted — called `currentSettings()` before
+ever acquiring that lock. A concurrent `NginxSettingsController::update()` landing in between could
+acquire the lock first, write its own new values, and persist its own Settings row; the other caller
+would then acquire the lock second and write the file back from its stale pre-update snapshot, silently
+reverting the winner's just-applied setting in the live nginx snippet even though Settings (and the WHM
+page) still showed the new value as current. New `applyCurrentSettings()` reads `currentSettings()`
+*inside* the same lock as the write, closing the gap; all three callers switched over.
+
+**`AppInstallation` could get stuck at `Installing` forever with zero admin visibility.** This one was
+already known and already deliberately excluded from `ResumeStuckSystemRuns`'s blind-flip sweep — same
+reasoning as `AddonDomainConversion`, since `AppInstallerService::runInstall()` only knows how to roll
+back what it created when it fails through its own normal code path, and a blind status flip on a
+hard-killed row could leave a real database/database-user/files-on-disk orphaned and invisible. But
+unlike `AddonDomainConversion`, which gets its own urgent, non-mutating admin alert, `AppInstallation`
+got nothing at all — the class's own doc comment said "tracked separately," and there was no separate
+tracking anywhere. Added `alertStuckAppInstallations()`, mirroring `alertStuckAddonDomainConversions()`
+exactly: no schema change needed, since `beginInstall()` sets `status = Installing` synchronously at row
+creation, so `created_at` already means what a dedicated `started_at` column would.
+
+```
+round:    initial  6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22
+findings:   many   4  ~30  9  13  13   5   2   2   0   2  ~20  ~15  15  ~45  ~24  ~65   3
+```
+
+Three findings is the smallest count since round fourteen's zero — not because the codebase is
+necessarily any cleaner than round twenty-one left it (three genuinely different, narrow gaps, not a
+systemic pattern this time), but it's the first round in a while where the *majority* of categories
+came back clean on a fresh, from-scratch read rather than finding new propagation gaps. Full suite now
+at 2,446 tests (up from 2,440), `pint --test` clean, deployed and live-verified via SSH on
+`panel-dev.knj.network`.
