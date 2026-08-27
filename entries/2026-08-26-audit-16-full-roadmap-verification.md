@@ -1246,3 +1246,99 @@ earlier round, just in one more file. That's real progress on breadth even thoug
 result. The account-deletion/conversion rollback design gap flagged and deliberately deferred at the end
 of round nineteen is still open and still deferred — nothing in round twenty changed the case for
 tackling that separately and deliberately rather than folding it into a sweep's momentum.
+
+## Round twenty-one — the biggest sweep yet, run fresh the next morning
+
+Same eight mechanical categories, same instruction: re-derive everything from the current code, don't
+trust a prior round's "clean" verdict. This round found more than any single round before it — roughly
+65 real findings — and, unlike round twenty, it wasn't just propagation gaps of already-known shapes.
+Several genuinely new patterns turned up.
+
+**The single most consequential finding: `ProvisioningScriptRunner::runLocal()` broke its own "never
+throws" contract.** This class's own docblock describes itself as the one choke point every
+mail-touching service calls into the privileged provisioning script through, and promises callers it
+always returns a `ProvisioningResult` — never an exception. But its `Process::timeout(30)->run(...)`
+call had no catch for a genuine timeout, so `ProcessTimedOutException` broke that promise silently for
+every one of its ~19 dependent services (mail relay, mail filters, spam filtering, greylisting,
+challenge-response, SMTP restrictions, mailing lists, all four mail auth-map families, mailbox
+create/delete/password, ClamAV, DKIM). None of those 19 services wrap their own calls into the runner in
+a try/catch, because the whole point of the runner is that they shouldn't have to. Fixed at the one
+source, not at 19 call sites.
+
+**A second systemic root cause, closing a gap this session has referenced but never directly fixed:
+`LockTimeoutException` extends the base `Exception`, not `RuntimeException`, and it was silently
+escaping through all four mail auth-map `regenerate()` methods** (`MailAuthMapService`,
+`ForwarderAuthMapService`, `MailingListAuthMapService`, and `DefaultAddressAuthMapService`, the last one
+caught only after this round's mail-fix agent flagged it as "found but out of scope" and I fixed it
+directly). Eleven separate controller actions across `MailController` and `MailingListController` only
+`catch (RuntimeException $e)`, which never actually caught it — a raw 500 under concurrent mail writes.
+Converting the exception at the four source methods fixes all eleven call sites at once, the same
+"fix the contract, not the callers" shape as the provisioning-runner fix above.
+
+**A third systemic root cause, and this round's own new construction-shape lesson: `updateOrCreate()`
+is treated throughout this codebase as if it were atomic, but it isn't** — it's Laravel's own
+select-then-write, exactly as racy as the bare `::create()` calls prior rounds already fixed. Fourteen
+more unprotected `updateOrCreate()`/`new Model()+save()` sites turned up this round (MIME types, hotlink
+protection, website optimization, mailbox certificates, database grants, error pages, default address,
+quick sites, autoresponders, server linking, the known-IP recorder, and the panel's own settings store),
+two of them on **public,
+unauthenticated** unsubscribe links, and one — the known-IP recorder — firing on **every login**, where
+a losing race is now swallowed silently rather than surfaced as an error, since the desired end state
+(the IP is recorded) is already true either way.
+
+**Two more prior-round regression tests turned out to have encoded the bug they were meant to catch.**
+`WafControllerTest`'s lock-contention test asserted `assertServerError()` — a raw 500 — as the correct
+outcome for a near-simultaneous ruleset update, and `SystemUpdateControllerTest`/
+`DatabaseUpgradeControllerTest` had the identical pattern. Same "test encodes the bug" failure mode
+round twenty already found once, now confirmed as a recurring risk of writing a regression test at the
+same moment a bug is discovered rather than after it's actually fixed — both updated in place alongside
+their fixes.
+
+**Genuinely new bug shapes, not propagation gaps:** `PanelCertService::issue()` could leave
+`panel.ssl_status` reading "active" in the DB after a successful cert issuance if the trailing nginx
+config apply then failed, with no admin-visible signal beyond a log line nobody was watching — now
+reverts the status and fires an admin alert through the same channel per-account SSL failures already
+use. `SystemCronJobService::updateNotifyEmail()` committed the new notify-email setting before calling
+`sync()`, with no rollback on failure — a direct regression against `CronJobService::updateCronEmail()`
+in the very same codebase, which wraps the identical shape in a transaction specifically to prevent
+this. `ChallengeResponseController::approve()` unconditionally told the user their held mail had been
+released, even when the release script actually failed and nothing moved. `TeamAccessController::resend()`
+rotated the invite token before attempting to send the new invite email, so a failed send left the
+collaborator with neither a working old link nor a working new one — the send now has to succeed before
+the rotation commits. `DatabaseManagerService::allowRemoteHost()`'s failure-rollback branch deleted the
+DB row on a firewall-sync failure but never revoked the just-created MySQL grant itself, unlike its own
+`QueryException` branch two lines above, which does — a live, fully-privileged remote MySQL account that
+would have been invisible to the panel from then on.
+
+**IDOR/authorization came back clean for the fourth round running** — 151 files, ~450 traced actions,
+zero new findings, the round-20 API reseller-permission fix confirmed still intact and its pattern
+holding everywhere else a reseller can reach another party's resource. That's the strongest "this
+category is actually solid" signal this audit has produced yet.
+
+Fourteen fix agents split the ~65 confirmed findings by file ownership to avoid conflicts (all sharing
+one working tree, not isolated worktrees — several agents independently noted seeing each other's
+in-progress changes via `git status`, which is expected and harmless since Pint's `--dirty` formatting
+pass is idempotent). Two findings fell through the cracks of that split — `DiagnosticController`'s
+identical uncaught-timeout shape and the `DefaultAddressAuthMapService` sibling gap mentioned above — and
+were fixed directly rather than spinning up more agents for two single-file changes. Full suite now at
+2,429 tests (up from 2,343), `pint --test` clean across the whole codebase. Live-verified: deployed
+commit confirmed via SSH, VERSION and queue-worker restart confirmed on `panel-dev.knj.network`.
+
+```
+round:    initial  6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21
+findings:   many   4  ~30  9  13  13   5   2   2   0   2  ~20  ~15  15  ~45  ~24  ~65
+```
+
+**Where this leaves the "is it clean" question.** Not clean, and this round is the clearest evidence
+yet that "clean" was never going to arrive on a fixed schedule — round twenty-one found more real bugs
+than any prior round, including round nineteen's original ~45. But the *character* of what it found
+matters as much as the count. Three of the biggest finding clusters this round (the provisioning-runner
+contract break, the auth-map `LockTimeoutException` leak, the `updateOrCreate()` atomicity assumption)
+are each a single root-cause fix that closed somewhere between 11 and 19 downstream symptoms at once —
+this is a different shape of progress than round twenty's one-bug-one-file propagation gaps, and a
+different shape again from round nineteen's scattered first-instances. IDOR/authorization's fourth
+consecutive clean round is the strongest single data point in the user's favor: it's the category where
+a real bug would matter most (cross-account data exposure), and it's the category that's held up best
+under the most scrutiny. The account-deletion/conversion rollback design gap flagged at the end of round
+nineteen, and still open through rounds twenty and twenty-one, remains the one deliberately-deferred item
+this audit keeps carrying forward rather than folding into sweep momentum.
