@@ -1342,3 +1342,49 @@ a real bug would matter most (cross-account data exposure), and it's the categor
 under the most scrutiny. The account-deletion/conversion rollback design gap flagged at the end of round
 nineteen, and still open through rounds twenty and twenty-one, remains the one deliberately-deferred item
 this audit keeps carrying forward rather than folding into sweep momentum.
+
+## Closing the deferred account-deletion gap — a deliberate design pass, not a sweep fix
+
+Flagged at the end of round nineteen and carried forward, untouched, through rounds twenty and
+twenty-one specifically because it needed real design rather than the mechanical pattern-matching
+that closes everything else this audit finds. `AccountProvisioningService::removeAccount()` hard-deleted
+the `Account`/`User` DB rows synchronously, then dispatched `DeprovisionAccountJob` to do the real
+system-level teardown — deleting the Linux user, home directory, mail, databases — asynchronously,
+best-effort, with every step wrapped in a log-and-continue `try/catch`. **The actual bug underneath
+this was worse than the design gap alone suggested**: `deprovisionRaw()`, the one call that runs the
+privileged `destroy` script, never checked its own script's exit code at all — it just ran the process
+and returned, unconditionally treating any outcome as success. That means the "job's best-effort
+teardown might silently fail" risk everyone assumed was theoretical was, in the literal current code,
+guaranteed never to be detected even when it happened — a failed `destroy` looked identical to a
+successful one from the job's point of view, every single time.
+
+**The fix, deliberately, is verify-before-delete, not persist-before-verify** — the exact discipline
+this whole audit has been enforcing everywhere else, applied here for the first time to the single
+highest-blast-radius operation in the panel. `removeAccount()` no longer deletes anything. It flips the
+account to a new `Deleting` status via an atomic conditional `UPDATE ... WHERE status != 'deleting'`
+(so two concurrent delete clicks can't both pass and both dispatch teardown), records
+`deletion_started_at`, and dispatches `DeprovisionAccountJob` with the `Account` model itself — matching
+this codebase's own established convention for every other "Run"-shaped async job (`MariadbUpgradeRun`,
+`PanelUpdateRun`, etc. all pass the model, not scalars; the old scalar-args shape here was a documented
+consequence of the delete-first ordering, not an independent design choice). The job now hard-deletes
+the account **only** after `deprovisionRaw()` (fixed to actually check `$result->successful()`) confirms
+real success; on failure it marks `DeletionFailed` with the script's error message and leaves the row
+fully intact — visible in the WHM accounts list, with a **Retry Deletion** action that re-dispatches the
+same job. A `Deleting`/`DeletionFailed` account's owner is blocked from logging in, the identical gate a
+`Suspended` account already had (`FortifyServiceProvider`'s `authenticateUsing()` closure, one `whereIn`
+widened). A `Deleting` account stuck past `DeprovisionAccountJob`'s own 90s timeout gets auto-flagged
+`DeletionFailed` by `ResumeStuckSystemRuns`'s existing sweep — added as its own dedicated method rather
+than forced into the shared `CONFIGS` array shape (which assumes a generic `started_at`/`completed_at`
+pair that doesn't fit `Account`'s own semantics), following the same "safe to blind-fail" reasoning that
+already governs everything else in that sweep except the one documented exception
+(`AddonDomainConversion`, whose underlying script genuinely cannot be re-run — `DeprovisionAccountJob`'s
+teardown steps, by contrast, are all safe to retry, so this fits the common case, not the exception).
+
+One test failure surfaced on the first full-suite run after this change —
+`ResellerScopingTest::test_reseller_can_destroy_own_account` — asserting the old immediate-hard-delete
+behavior; updated alongside the four other test files (`DeprovisionAccountJobTest`,
+`AccountControllerTest`, `AccountCreationTest`, `AccountApiTest`) that needed the same "row now survives
+as Deleting under `Bus::fake()`" adjustment, plus new coverage in `AccountProvisioningServiceTest`,
+`ResumeStuckSystemRunsTest`, and `AccountModifySuspendTest` for the new status transitions, the retry
+action, the double-deletion guard, the stuck-sweep, and the login block. Full suite now at 2,440 tests
+(up from 2,429), `pint --test` clean, deployed and live-verified via SSH on `panel-dev.knj.network`.
