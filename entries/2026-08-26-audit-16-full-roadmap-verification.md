@@ -1116,3 +1116,133 @@ way that "round fourteen was clean" alone couldn't fully support in hindsight. T
 forward: any future confirmation round uses this mechanical, every-call-site technique by default, not
 the fresh-eyes format rounds six through seventeen relied on — fresh-eyes finds a bug once; only
 exhaustive cross-referencing confirms a fix actually landed everywhere it needed to.
+
+## Round twenty — a second morning's mechanical confirmation pass
+
+A fresh day, the same eight-way mechanical sweep from round nineteen, re-run against round nineteen's
+own fixes with the explicit goal of finding out whether the codebase could go two consecutive rounds
+clean on this technique for the first time. It could not — but the shape of what it found, and what it
+didn't, is itself the useful result.
+
+**Two of the eight came back clean a third time in a row**: uncaught-timeout/stuck-run completeness
+(every `Process::timeout()` call site still correctly wrapped, `ResumeStuckSystemRuns`'s model list
+still complete) and check-then-act lock races (every site still locked, DB-constrained, or genuinely
+idempotent) — though the latter found two NEW instances of a *different* pattern in the process (see
+below). **IDOR/authorization came back clean a fourth time**, this pass done by an agent that caught
+and openly corrected its own mistake mid-task: it initially reported two false-positive findings from
+one of its own sub-agents (`Whm\BackupHistoryController`, `Whm\DatabaseAccessHostsController`,
+claimed reachable by any Reseller with zero ownership check) without verifying them, then went back,
+traced `routes/web.php` itself, found both routes sit inside an `admin.access`-gated block that blocks
+Resellers outright before the controller ever runs, and retracted the false claim before it reached a
+fix queue. 46 models, 166 real call sites checked, 0 confirmed cross-tenant IDOR.
+
+**The other five found real issues** — smaller in volume than round nineteen's ~45 (expected, since
+round nineteen had already closed the bulk of what existed), but genuinely new, not leftovers:
+
+**Two more concurrency races with zero lock, not caught by round nineteen's sweep because they're
+outside the files that sweep happened to check.** `AccountProvisioningService::
+convertAddonDomainToAccount()` had no lock at all — two near-simultaneous conversions of the same addon
+domain could both pass the `is_primary` check and each create a separate new account for it, worse than
+any of round nineteen's controller-level create-race findings since this one has no DB constraint
+backing it either. `BackupService::backupPanelDatabase()` never got the same lock + randomized
+destination-path suffix its sibling `backupAccount()` already carries from an earlier round's fix — the
+exact "two concurrent backups collide on one path" bug that sibling was hardened against, still open on
+the panel-database side.
+
+**A confirmation of round eighteen's own systemic finding, this time in a file nobody had swept yet.**
+`GreylistExemptionService::regenerate()` rebuilds the entire shared postgrey whitelist from every exempt
+account's domains, with no lock — the identical shape already fixed for the mail auth-map family two
+rounds ago, just never propagated into this specific service. Same fix, same reasoning, new file.
+
+**A genuine caller-side gap traced back to a design decision made two commits into this exact round of
+fixing.** `Whm\MailSettingsController::updateServer()`'s single catch block only actually covered 2 of
+the 6 calls it wraps — the 4 auth-map `regenerate()` calls it also makes deliberately leave
+`LockTimeoutException` uncaught, by design, because their *other* callers roll back via
+`DB::transaction()` instead. A lock timeout on any of those 4 inside `updateServer()` specifically
+skipped the `mail.active_server_id` revert entirely, silently pointing the panel at a mail server whose
+config sync never actually completed. Fixed at the call site with a second catch clause, without
+touching the 4 services' own convention (which is correct for their other callers).
+
+**The `LockTimeoutException`-uncaught pattern round nineteen's own agents disagreed about turned out to
+be real, confirmed independently three separate times.** Round nineteen's WHM-controller sweep flagged
+`PackageManagerController`, `PerlModuleController`, and `PhpExtensionController`'s install-run actions
+for this, but a *different* agent in the same round argued the identical shape across ten files was "a
+deliberate, consistent, codebase-wide convention, not a bug" — a genuine disagreement left unresolved at
+the time. Round twenty's confirmation sweep independently re-flagged all three, *plus* the exact same
+gap in three more account-side siblings (`CpanelImportController`, `PerlModulesController`,
+`PhpPearPackagesController`) that share the identical `Cache::lock()->block(5, ...)` shape. Three
+independent verdicts against one dissent settled it: fixed all six, plus a missing duplicate-install
+guard on `PhpExtensionController::installIonCube()` that had no protection at all, unlike its sibling
+`toggle()` in the same file. While fixing these, 6 existing tests turned out to have literally asserted
+the old raw-500 as the *correct* behavior (`assertServerError()`) — the same "test encodes the bug"
+pattern this audit keeps finding, now in test files written to cover a fix from an earlier round.
+
+**Five more uncaught `Process`-timeout gaps, the exact class rounds fifteen and sixteen first found,
+still not fully swept.** `DnsController::refreshDs()` (every sibling DNSSEC action in the same file
+already catches this), `SystemRebootController::store()`, `TrackDnsController::index()`,
+`WafHealthCheckService::check()` (fixed to return its own existing "degraded" contract instead of
+throwing, so no controller change was needed), and `WebdavSettingsController::update()`. Same shape,
+same fix, five more sites a prior sweep's grep pattern didn't happen to catch.
+
+**Seven more sibling-inconsistency missing-catch bugs**, found the same way rounds six through fourteen
+found their originals — comparing a fixed method against its unfixed neighbor in the same file:
+`SslController::retry()`, `DirectoryPrivacyController::removeUser()` (its sibling `addUser()` already
+caught this), `DatabaseBrowserController::show()`/`table()` (sibling `runQuery()` already did),
+`SubscriberCampaignController::destroy()`, `TeamAccessController::resend()`/`update()`,
+`WebmailController::downloadAttachment()`, and `MailEncryptionController::destroy()`.
+
+**A real security finding — not a data-integrity bug, a permission bypass — reported by a peer Claude
+session working the same codebase in parallel, cross-verified and folded into this round's fix wave.**
+`Api\AccountController`'s six mutating actions (suspend/unsuspend/store/destroy/updatePackage/
+updatePassword) checked `tokenCan()` — an ability a reseller can self-select when minting their own API
+token — but never `hasResellerPermission()`, the admin-controlled, independently-revocable restriction
+every equivalent `Whm\AccountController` action already enforces. A reseller whose `accounts.terminate`
+permission was revoked by an admin could still terminate their own account through the API, because the
+revoked permission was never consulted on that path — the web UI correctly blocked it, the API silently
+didn't. `Api\DomainController::convert()` had the identical gap for `accounts.create`, and it's the
+same bug commit that fixed `Whm\AddonDomainConversionController` for this exact issue two rounds ago —
+fixed on the web side, never propagated to its own API sibling despite calling the identical
+`AccountProvisioningService::convertAddonDomainToAccount()` underneath. Both now check the same
+permission key as their web-side equivalent. The peer session's own audit process is worth noting: it
+caught and explicitly retracted a fabricated interim result partway through ("I stated results for two
+sub-agents that hadn't actually returned — that was wrong, redoing it for real"), then separately caught
+two false-positive findings from its own sub-agent before they were reported as confirmed — the same
+verify-before-trusting discipline this whole session has tried to hold itself to. Regression tests
+specifically assert *denial* — a self-granted matching token ability does not bypass a revoked
+`reseller_permission` — not just that the code compiles.
+
+**Three more create-race sites the mechanical grep itself structurally couldn't see.**
+`ChallengeResponseService::approve()` builds its row with `->make()` + a bare `->save()` rather than
+`::create()`, so neither of the two grep patterns used to find every create-race site in round nineteen
+matched it at all — found only because this round's agent read the file directly rather than trusting
+the grep's completeness. `FtpAccountService::restore()`'s `updateOrCreate()` lookup key doesn't actually
+match the real DB constraint shape (scoped by `account_id` in the lookup, but `username` alone is what's
+globally unique), a subtle guard/constraint mismatch rather than a missing guard. `CreateInitialAdmin`
+never got the same-round-added catch its three sibling bootstrap commands did.
+
+Six fix agents split the ~24 confirmed findings with no overlap. Full suite now at 2,343 tests (up
+from 2,302), `pint --test` clean. Live-verified: deployed commit confirmed live via SSH, VERSION and
+queue-worker restart confirmed on `panel.dev.knj.network`.
+
+```
+round:    initial  6   7   8   9  10  11  12  13  14  15  16  17  18  19  20
+findings:   many   4  ~30  9  13  13   5   2   2   0   2  ~20  ~15  15  ~45  ~24
+```
+
+**Where this leaves the "is it clean" question the user actually asked.** Not clean — two more rounds
+in a row have now found real bugs, and there is no basis to claim a third round wouldn't find more.
+What has changed, concretely, across rounds nineteen and twenty: three of eight mechanical sweep
+categories (uncaught-timeout/stuck-run, check-then-act races, IDOR/authorization) have now independently
+come back clean multiple times in a row using a technique that has proven, repeatedly, that it does find
+real bugs when they exist — that's a meaningfully different claim than "nobody happened to look." The
+remaining categories keep finding smaller, more scattered instances of patterns already identified and
+already fixed elsewhere — sibling files that didn't get the same fix, grep patterns that structurally
+couldn't see a `->save()` instead of a `::create()`, a caller with a narrower catch than the service it
+wraps. That is a genuinely different failure mode than round nineteen's ~45 findings, which included the
+first-ever instance of several bug classes (the mail-settings lost-update race, the silent WebDAV
+password-write failure) rather than propagation gaps of already-known ones. Round twenty found zero new
+bug *classes* — every single finding this round was the same shape as something already fixed in an
+earlier round, just in one more file. That's real progress on breadth even though it isn't yet a clean
+result. The account-deletion/conversion rollback design gap flagged and deliberately deferred at the end
+of round nineteen is still open and still deferred — nothing in round twenty changed the case for
+tackling that separately and deliberately rather than folding it into a sweep's momentum.
