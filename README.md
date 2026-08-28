@@ -124,3 +124,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 135 - A Morning of Bug Reports, and One That Took Two Passes](entries/2026-08-28-morning-bug-sweep-and-cert-timeout-fix.md)
 - [Phase 136 - The Placeholder Logo Nobody Had Replaced](entries/2026-08-28-parked-domain-logo.md)
 - [Phase 137 - The Half of a Server Switch Nobody Had Built](entries/2026-08-28-mailbox-data-migration.md)
+- [Phase 138 - The Dashboard Mail Only Never Got](entries/2026-08-28-mail-only-dashboard-parity.md)
