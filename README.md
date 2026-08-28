@@ -121,3 +121,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 132 - File Manager Gets a Real Code Editor](entries/2026-08-25-file-manager-code-editor.md)
 - [Phase 133 - One Page for Every Alert](entries/2026-08-25-notifications-page.md)
 - [Phase 134 - Audit #16: Verifying Every "Live" Row Is Actually True](entries/2026-08-26-audit-16-full-roadmap-verification.md)
+- [Phase 135 - A Morning of Bug Reports, and One That Took Two Passes](entries/2026-08-28-morning-bug-sweep-and-cert-timeout-fix.md)
