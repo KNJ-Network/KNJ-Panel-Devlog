@@ -140,3 +140,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 151 - Array First, Finally Last](entries/2026-08-29-roundcube-real-fatal-found.md)
 - [Phase 152 - Guarding What Should Never Have Needed Guarding](entries/2026-08-29-roundcube-fix-shipped.md)
 - [Phase 153 - The Quota Plugin That Needed a Friend](entries/2026-08-29-imap-quota-plugin-fix.md)
+- [Phase 154 - The Socket That Was Never Uncommented](entries/2026-08-29-postfix-sasl-socket-self-heal.md)
