@@ -1,24 +1,24 @@
 # Phase 139 - Real Nameserver Management, and DNS That Actually Follows Mail
 
 Two related pieces of DNS work today, both triggered by the same real-world moment: watching a
-freshly-created Mail Only satellite actually take over mail for a domain, and asking what WHM/cPanel
-would show an admin at that point.
+freshly-created Mail Only satellite actually take over mail for a domain, and asking what a proper
+hosting-panel admin interface would show at that point.
 
 ## A real Nameservers page
 
 Every domain's DNS zone has always needed an NS record pointing somewhere, but until now that
 "somewhere" was a single legacy `dns.nameserver_hostname` setting, or — if that was never set — this
 server's own hostname. That's fine for a one-box install, but doesn't hold up once an admin actually
-registers ns1/ns2 and wants every new zone to list both, the way real WHM's Basic Networking Setup
-does.
+registers ns1/ns2 and wants every new zone to list both, the way established hosting-panel
+conventions do.
 
 Built a proper `DnsNameserver` model as the primary source of truth, with a fallback chain that
 keeps every existing install's zones working unchanged: configured nameserver rows first, then the
 legacy setting, then the server's own hostname. A new Nameservers page (add/edit/remove, reorder,
 each with its own IP and optional IPv6) replaces the old single hostname field on DNS Settings.
-Adding a nameserver also does the thing real WHM does and a lot of panels skip — it registers that
-nameserver's own A record in whatever zone matches its parent domain, so `ns1.example.com` actually
-resolves once it's added, not just referenced.
+Adding a nameserver also does something a lot of panels skip — it registers that nameserver's own A
+record in whatever zone matches its parent domain, so `ns1.example.com` actually resolves once it's
+added, not just referenced.
 
 `createZoneRecords()` now writes one NS record per configured nameserver instead of a single
 hardcoded line, and the self-service "Restore Default Records" recovery action checks each
