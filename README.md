@@ -144,3 +144,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 155 - The Self-Heal That Healed Nothing](entries/2026-08-29-postfix-sasl-self-heal-fix-2.md)
 - [Phase 156 - The Uniqueness Check That Didn't Understand the Point](entries/2026-08-29-attach-existing-login-fix.md)
 - [Phase 157 - The Autofill Nobody Asked For](entries/2026-08-29-attach-existing-login-fix-2.md)
+- [Phase 158 - The Nameserver That Couldn't Vouch For Itself](entries/2026-08-29-dns-zone-missing-glue-fix.md)
