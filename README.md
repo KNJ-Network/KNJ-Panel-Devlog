@@ -127,3 +127,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 138 - The Dashboard Mail Only Never Got](entries/2026-08-28-mail-only-dashboard-parity.md)
 - [Phase 139 - Real Nameserver Management, and DNS That Actually Follows Mail](entries/2026-08-29-nameservers-and-mail-dns-follow.md)
 - [Phase 140 - The PTR Check Was Looking at the Wrong Server](entries/2026-08-29-email-deliverability-ptr-follows-mail-server.md)
+- [Phase 141 - Roundcube Was Installed on Mail Only, Just Never Wired Up](entries/2026-08-29-roundcube-mail-only-role-gate.md)
