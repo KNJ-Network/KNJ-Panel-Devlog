@@ -138,3 +138,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 149 - Asking Instead of Guessing](entries/2026-08-29-roundcube-logs-unsuppressed-errors.md)
 - [Phase 150 - The Log That Was Never Being Written](entries/2026-08-29-roundcube-fpm-pool-error-log.md)
 - [Phase 151 - Array First, Finally Last](entries/2026-08-29-roundcube-real-fatal-found.md)
+- [Phase 152 - Guarding What Should Never Have Needed Guarding](entries/2026-08-29-roundcube-fix-shipped.md)
