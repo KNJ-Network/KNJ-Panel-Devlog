@@ -133,3 +133,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 144 - The Directory Roundcube Could Never Write To](entries/2026-08-29-roundcube-logs-ownership.md)
 - [Phase 145 - Trusting the Guard Less](entries/2026-08-29-roundcube-guard-diagnostics.md)
 - [Phase 146 - One of Two, and Only One of Two](entries/2026-08-29-roundcube-logs-immutable-hunt.md)
+- [Phase 147 - Not Explaining It, Just Ending It](entries/2026-08-29-roundcube-logs-recreate.md)
