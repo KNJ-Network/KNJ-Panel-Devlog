@@ -131,3 +131,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 142 - A Key That Was Never 24 Characters Long](entries/2026-08-29-roundcube-des-key.md)
 - [Phase 143 - When the Fix Runs Clean and the Bug Doesn't Care](entries/2026-08-29-roundcube-diagnostics-page.md)
 - [Phase 144 - The Directory Roundcube Could Never Write To](entries/2026-08-29-roundcube-logs-ownership.md)
+- [Phase 145 - Trusting the Guard Less](entries/2026-08-29-roundcube-guard-diagnostics.md)
