@@ -173,3 +173,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 163 - A Report Nobody Has to Remember to Check](entries/2026-08-30-subscriber-daily-report.md)
 - [Phase 164 - The Account That Wouldn't Leave](entries/2026-08-30-mail-auth-map-deletion-fix.md)
 - [Phase 165 - The Box Was Too Small For Its Own Text](entries/2026-08-30-input-padding-fix.md)
+- [Phase 166 - The 4GB Limit That Was Never Real](entries/2026-08-30-cpanel-import-large-upload-fix.md)
