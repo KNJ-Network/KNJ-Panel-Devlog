@@ -46,3 +46,48 @@ settings; the strengthened one confirms a *write* failure (the case that already
 still never schedules a reload at all. Tested (2565/2565).
 
 Released as v0.17.18.
+
+## Round 2 - The fix that still 502'd once
+
+Live-testing this exact fix on panel-dev — save the form, confirm the Setting rows landed, confirm
+no 502 — the *save request itself* came back clean. Then the browser did what browsers do after a
+303 redirect and auto-followed it, and that follow-up GET came back `502 Bad Gateway`. Refreshing a
+second later loaded fine, and the saved values were correctly there — so `App::terminating()` had
+fixed the exact bug reported (the admin's own response no longer got eaten, and the Setting rows no
+longer got lost), but a *new*, narrower window opened up right behind it.
+
+The reason: reloading `php8.5-fpm` restarts every pool on the box at once, not just the worker that
+happened to call for it. `App::terminating()` runs in the same PHP-FPM worker process, in the same
+instant `fastcgi_finish_request()` hands the response off to nginx — there is no gap between "the
+save response is gone" and "the pool-wide restart begins." The browser's auto-follow GET fires within
+milliseconds of receiving the redirect, which is more than enough to land squarely inside that
+restart window even though it's a completely different request landing on a (probably) completely
+different worker.
+
+Deferring further in the same process can't close a gap that's about which *pool*, not which
+*request* — so the reload moved off the request lifecycle entirely: a new `ReloadPhpFpmJob`,
+queued (this app already runs `knjpanel-queue.service`, a database-backed `queue:work` process) with
+a 3-second delay. The redirect-follow request — and, realistically, the page render after it —
+finishes well inside that window on any reasonable connection, so the disruptive part of the reload
+never overlaps a request that has anything to do with the save that triggered it. Same
+best-effort-and-log failure handling as `InstallWafEngineJob`/`UpdateWafRulesetJob`, the two existing
+jobs in this codebase built around the same "somebody has to reload something disruptive later"
+shape.
+
+One new job-level test (`ReloadPhpFpmJobTest`) covers `handle()` actually calling the reload action
+and a failed reload getting logged rather than thrown; `PhpSettingsTest` swapped its `Process`-based
+assertion on the reload for a `Bus::fake()` one confirming `ReloadPhpFpmJob` is dispatched with a
+delay and never runs inline. Tested (2572/2572).
+
+Re-verified live on panel-dev, deliberately more rigorously than the first pass that missed the
+redirect-follow race — browser-automation clicks and the network-request log turned out to be too
+ambiguous to trust here (couldn't reliably tell a real submit from a UI no-op, and stale console
+entries survived same-tab navigations). Drove the save directly from the page's own JS console
+instead: a `fetch()` POST to the form's own action got back a same-origin redirect (not a raw error),
+an immediate follow-up `fetch()` GET came back `200` with the new `memory_limit_mb` value already in
+the rendered HTML, and — the part that actually proves the *reload*, not just the write — `ps` showed
+every php8.5-fpm pool's worker processes freshly restarted a few seconds later, right on schedule with
+the job's delay. Setting row and `99-knjpanel-global.ini` both correctly hold the saved value
+afterward, and `storage/logs/laravel.log` has nothing from `ReloadPhpFpmJob`, confirming a clean run.
+
+Released as v0.17.20.
