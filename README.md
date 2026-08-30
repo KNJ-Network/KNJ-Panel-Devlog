@@ -168,3 +168,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 158 - The Nameserver That Couldn't Vouch For Itself](entries/2026-08-29-dns-zone-missing-glue-fix.md)
 - [Phase 159 - Dogfooding the Deploy Button](entries/2026-08-30-deploy-from-git-live-test.md)
 - [Phase 160 - Three Things the Real Servers Wanted](entries/2026-08-30-phpmyadmin-selfheal-no-autodb-bulk-update.md)
+- [Phase 161 - The Address Bar Problem](entries/2026-08-30-webmail-account-controller-proxy.md)
