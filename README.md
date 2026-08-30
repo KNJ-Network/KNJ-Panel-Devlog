@@ -176,3 +176,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 166 - The 4GB Limit That Was Never Real](entries/2026-08-30-cpanel-import-large-upload-fix.md)
 - [Phase 167 - The Save That Ate Its Own Response](entries/2026-08-30-php-settings-reload-502.md)
 - [Phase 168 - Closing the Loop on the Body-Size Fix](entries/2026-08-30-panel-vhost-auto-reapply-and-upload-progress.md)
+- [Phase 169 - The Upload That Vanished](entries/2026-08-30-cpanel-import-error-swallowed-by-xhr-redirect.md)
