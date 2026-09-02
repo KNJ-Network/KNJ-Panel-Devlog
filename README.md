@@ -165,3 +165,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 176 - The Subdomain That Never Got Its Address](entries/2026-09-02-dns-missing-records-fix.md)
 - [Phase 177 - Your Domain, Your Port, Your Certificate](entries/2026-09-02-ssl-direct-port-access-and-disk-usage-fix.md)
 - [Phase 178 - Closing the Loop on Two Patterns](entries/2026-09-02-stale-relation-and-log-duplication-followups.md)
+- [Phase 179 - The Address Book Nobody Went Looking For](entries/2026-09-02-cpanel-restore-contacts-import.md)
