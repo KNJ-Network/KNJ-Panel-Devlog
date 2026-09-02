@@ -178,3 +178,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 168 - Closing the Loop on the Body-Size Fix](entries/2026-08-30-panel-vhost-auto-reapply-and-upload-progress.md)
 - [Phase 169 - The Upload That Vanished](entries/2026-08-30-cpanel-import-error-swallowed-by-xhr-redirect.md)
 - [Phase 170 - The Password Nobody Should Be Able to Reuse](entries/2026-09-02-temporary-password-reset.md)
+- [Phase 171 - A Firewall Page That Actually Does Something](entries/2026-09-02-firewall-general-rules.md)
