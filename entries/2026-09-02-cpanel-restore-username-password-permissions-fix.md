@@ -1,17 +1,17 @@
 # Phase 172 - What a Real Customer Restore Actually Breaks
 
 Every phase testing the cPanel restore feature so far had used either a hand-built synthetic
-archive or, later, one real ~975MB WHM Full Backup pulled specifically to verify the format. This
+archive or, later, one real ~975MB backup archive pulled specifically to verify the format. This
 phase was the first time it ran against an actual customer's account, restored for real, with a
 real website depending on the result. It broke in three different ways, none of which the earlier
 testing had surfaced.
 
 ## Seven characters that mattered
 
-The operator's own account was a real one — `visiontech336.com`, a genuine cPanel account with an
-8-character username, `visionte`. After the restore, the new account came out as `visiont` — one
+The operator's own account was a real one — `visiontech336.com`, with an original 8-character
+username, `visionte`. After the restore, the new account came out as `visiont` — one
 character short. `AccountProvisioningService::generateUsername()` had always truncated to 7
-characters, matching nothing in particular; cPanel's own usernames are 8. Nobody had noticed before
+characters, matching nothing in particular; the original username was 8. Nobody had noticed before
 because nothing about a *synthetic* archive cares what the username matches — a fresh throwaway
 domain gets a fresh throwaway username and nothing else references it. A real restore is different:
 KNJ generates every database name and database username from the account's own system username
@@ -31,11 +31,11 @@ copied over verbatim as part of the same restore. A random new password was neve
 that file no matter how well the username matched.
 
 The fix follows a precedent already sitting in the same codebase: mailbox passwords aren't reset on
-restore either. cPanel's `homedir/etc/<domain>/shadow` carries a real SHA-512-crypt hash per
+restore either. The archive's own `homedir/etc/<domain>/shadow` carries a real SHA-512-crypt hash per
 mailbox, and `MailboxService::setPasswordHash()` transplants it directly rather than generating
 something new — the original password just keeps working, because MySQL and Dovecot alike are happy
 to accept an account created from a pre-computed hash instead of a plaintext. The natural question
-was whether MySQL databases had an equivalent. They do: a real WHM Full Backup's `mysql.sql-auth.json`
+was whether MySQL databases had an equivalent. They do: a real backup archive's `mysql.sql-auth.json`
 carries a `mysql_native_password` hash per database username, hex-encoded for JSON safety (confirmed
 by pulling the real archive and hex-decoding a sample by hand — this codebase has been burned before
 by trusting a third-party description of an archive format instead of a real sample, so this got the
@@ -71,10 +71,10 @@ normal, readable error instead of a crash.
 ## What's still just a warning
 
 The operator asked, reasonably, whether the restore should actively check for a username mismatch
-and offer to fix it — then immediately answered their own question: matching cPanel's real 8-character
+and offer to fix it — then immediately answered their own question: matching the original 8-character
 length should already prevent the mismatch from happening in the first place. That's almost certainly
 right, so this phase added the cheap, honest version of the idea instead of a whole new confirmation
-flow: a real WHM Full Backup's `cp/<username>` file name *is* the account's canonical original
+flow: a real backup archive's `cp/<username>` file name *is* the account's canonical original
 username, so the restore now compares it against the newly generated one and logs a plain warning —
 never a block — if they still don't match. Something to notice, not something to get in the way.
 
