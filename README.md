@@ -159,3 +159,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 170 - The Password Nobody Should Be Able to Reuse](entries/2026-09-02-temporary-password-reset.md)
 - [Phase 171 - A Firewall Page That Actually Does Something](entries/2026-09-02-firewall-general-rules.md)
 - [Phase 172 - What a Real Customer Restore Actually Breaks](entries/2026-09-02-cpanel-restore-username-password-permissions-fix.md)
+- [Phase 173 - Not Every Warning Deserves the Same Button](entries/2026-09-02-security-scan-fix-now.md)
