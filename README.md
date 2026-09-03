@@ -176,3 +176,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 187 - A Wrong Answer Beats a Random One](entries/2026-09-03-ssl-self-signed-fallback.md)
 - [Phase 188 - The Shortcut That Called Itself](entries/2026-09-03-direct-port-loopback-recursion-fix.md)
 - [Phase 189 - The Page That Grew Instead of Scrolling](entries/2026-09-03-webmail-layout-and-contacts-dispatch-fix.md)
+- [Phase 190 - The File That Came From Somewhere Else](entries/2026-09-03-dovecot-index-migration-fix.md)
