@@ -172,3 +172,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 183 - The Fix That Wasn't the Whole Fix](entries/2026-09-03-satellite-asset-origin-hang-fix.md)
 - [Phase 184 - Teaching the Restore Itself to Look](entries/2026-09-03-restore-time-backdoor-scanning.md)
 - [Phase 185 - The Tool That Checked Itself](entries/2026-09-03-backdoor-scanner-false-positive-fix.md)
+- [Phase 186 - The Shortcut That Didn't Ask](entries/2026-09-03-webmail-shortcut-and-contacts-sync.md)
