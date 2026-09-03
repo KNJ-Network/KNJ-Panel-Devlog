@@ -170,3 +170,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 181 - The Filesystem Nobody Was Watching](entries/2026-09-03-home-mount-quota-fix.md)
 - [Phase 182 - What Else Were We Not Looking For](entries/2026-09-03-restore-forwarders-ftp-cron.md)
 - [Phase 183 - The Fix That Wasn't the Whole Fix](entries/2026-09-03-satellite-asset-origin-hang-fix.md)
+- [Phase 184 - Teaching the Restore Itself to Look](entries/2026-09-03-restore-time-backdoor-scanning.md)
