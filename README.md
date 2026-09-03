@@ -166,3 +166,6 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 177 - Your Domain, Your Port, Your Certificate](entries/2026-09-02-ssl-direct-port-access-and-disk-usage-fix.md)
 - [Phase 178 - Closing the Loop on Two Patterns](entries/2026-09-02-stale-relation-and-log-duplication-followups.md)
 - [Phase 179 - The Address Book Nobody Went Looking For](entries/2026-09-02-cpanel-restore-contacts-import.md)
+- [Phase 180 - The Page That Was Never Going to Load](entries/2026-09-03-dashboard-hang-fix.md)
+- [Phase 181 - The Filesystem Nobody Was Watching](entries/2026-09-03-home-mount-quota-fix.md)
+- [Phase 182 - What Else Were We Not Looking For](entries/2026-09-03-restore-forwarders-ftp-cron.md)
