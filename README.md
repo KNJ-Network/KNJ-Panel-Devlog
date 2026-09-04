@@ -184,3 +184,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 195 - Two Doors, Both Assumed Open](entries/2026-09-04-malware-scan-quarantine-fixes.md)
 - [Phase 196 - Waiting in Line, Twice](entries/2026-09-04-dashboard-load-and-webmail-sort-fixes.md)
 - [Phase 197 - Four Ways to Find Out](entries/2026-09-04-malware-scan-notifications.md)
+- [Phase 198 - The Animation That Only Ran When Nobody Was Watching](entries/2026-09-05-shield-status-visual.md)
