@@ -179,3 +179,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 190 - The File That Came From Somewhere Else](entries/2026-09-03-dovecot-index-migration-fix.md)
 - [Phase 191 - A Rule That Only Applies to One Kind of Asking](entries/2026-09-03-subscribe-form-cors-fix.md)
 - [Phase 192 - The Same Symptom, a Different Door](entries/2026-09-03-subscribe-form-rewrite-fix.md)
+- [Phase 193 - The List That Needed One More Name](entries/2026-09-04-2fa-setup-rewrite-fix.md)
+- [Phase 194 - Standing In Someone Else's Shoes, Correctly](entries/2026-09-04-impersonation-guard-mismatch-fix.md)
