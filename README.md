@@ -182,3 +182,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 193 - The List That Needed One More Name](entries/2026-09-04-2fa-setup-rewrite-fix.md)
 - [Phase 194 - Standing In Someone Else's Shoes, Correctly](entries/2026-09-04-impersonation-guard-mismatch-fix.md)
 - [Phase 195 - Two Doors, Both Assumed Open](entries/2026-09-04-malware-scan-quarantine-fixes.md)
+- [Phase 196 - Waiting in Line, Twice](entries/2026-09-04-dashboard-load-and-webmail-sort-fixes.md)
