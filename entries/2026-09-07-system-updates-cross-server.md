@@ -53,7 +53,19 @@ the ones added but never actually finished linking — was already being asked a
 separate places in the code, each written slightly differently. Worth becoming one thing before it
 became a fifth.
 
-Full suite green, pint clean. Live verification is next — a second linked test server just came
-online specifically to make this possible without touching the real production stack, so the plan
-from here is: cut a release, update that one disposable server to it, and put every part of this
-through its paces there first.
+Full suite green, pint clean — and then live verification, against a real second server for the
+first time, caught something the tests structurally couldn't. Every one of the four new endpoints
+came back with a plain "session expired" page instead of the answer it was supposed to give. Every
+other endpoint like it in this codebase carries an explicit exemption — the whole point of this
+channel is that it authenticates itself, in the URL, with no session behind it at all, so checking
+for a session token that will never exist just fails the request outright. These four were never
+added to that list. The reason the automated suite sailed straight through anyway: that same check
+is switched off for every test in this project, on principle, since none of them carry a browser
+session either — so this exact gap had no way of showing up until something used the real thing.
+One line added per endpoint, a second small release cut, and the second attempt went straight
+through: a real check against a real linked server, a real batch of pending packages applied and
+mirrored back correctly, and a real reboot — down, then back up, every service healthy on the other
+side.
+
+This is exactly the case the disposable second server was built for. A five-minute detour, caught
+and fixed before it ever had the chance to reach anything that mattered.
