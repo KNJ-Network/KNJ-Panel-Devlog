@@ -190,3 +190,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 201 - One Click Instead of One Account at a Time](entries/2026-09-04-bulk-scan-now.md)
 - [Phase 202 - The Folder That Was Never Really There](entries/2026-09-05-webmail-noselect-folder-fix.md)
 - [Phase 203 - A Weekend of Someone Else Actually Using It](entries/2026-09-06-son-testing-batch.md)
+- [Phase 204 - The Bar That Had Nothing to Measure](entries/2026-09-07-malware-scan-progress-bar.md)
