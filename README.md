@@ -194,3 +194,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 205 - The Other Update Button Learns the Same Trick](entries/2026-09-07-system-updates-cross-server.md)
 - [Phase 206 - The Answer That Never Got Asked Again](entries/2026-09-07-panel-update-cache-staleness.md)
 - [Phase 207 - The Server That Wasn't In Its Own Table](entries/2026-09-09-servers-table-unification.md)
+- [Phase 208 - Completed Isn't the Same as Nothing To Do](entries/2026-09-09-updates-available-and-live-refresh.md)
+- [Phase 209 - The Two Groups That Got To Fold Up](entries/2026-09-09-collapsible-sidebar-everywhere.md)
