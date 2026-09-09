@@ -198,3 +198,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 209 - The Two Groups That Got To Fold Up](entries/2026-09-09-collapsible-sidebar-everywhere.md)
 - [Phase 210 - Nothing Happened, As Far As Anyone Could Tell](entries/2026-09-09-copy-feedback-and-loading-state.md)
 - [Phase 211 - The Answer Nobody Asked For, Rejecting Itself](entries/2026-09-09-password-confirmation-and-username-login.md)
+- [Phase 212 - The App That Lived at Someone Else's Address](entries/2026-09-09-app-catalog-and-the-app-that-lived-at-someone-elses-address.md)
