@@ -193,3 +193,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 204 - The Bar That Had Nothing to Measure](entries/2026-09-07-malware-scan-progress-bar.md)
 - [Phase 205 - The Other Update Button Learns the Same Trick](entries/2026-09-07-system-updates-cross-server.md)
 - [Phase 206 - The Answer That Never Got Asked Again](entries/2026-09-07-panel-update-cache-staleness.md)
+- [Phase 207 - The Server That Wasn't In Its Own Table](entries/2026-09-09-servers-table-unification.md)
