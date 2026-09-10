@@ -202,3 +202,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 213 - The Tool That Would Only Add](entries/2026-09-09-domains-page-and-the-tool-that-would-only-add.md)
 - [Phase 214 - The Address That Worked the First Time](entries/2026-09-10-invoice-ninja-and-the-address-that-worked-the-first-time.md)
 - [Phase 215 - The Address That Worked, Then Didn't](entries/2026-09-10-invoice-ninja-the-address-that-worked-twice-over.md)
+- [Phase 216 - The Tools That Forgot There Were Others](entries/2026-09-10-domains-page-and-the-tools-that-forgot-there-were-others.md)
