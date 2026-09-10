@@ -230,3 +230,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 220 - The State Nobody Ever Entered](entries/2026-09-10-ssl-pill-and-the-state-nobody-ever-entered.md)
 - [Phase 221 - The Table That Only Ever Said One Thing](entries/2026-09-10-domain-selector-polish-and-the-table-that-only-ever-said-one-thing.md)
 - [Phase 222 - The Index That Was Secretly Load-Bearing](entries/2026-09-10-the-migration-that-couldnt-drop-its-own-support.md)
+- [Phase 223 - The Installs List That Only Showed One Answer](entries/2026-09-10-the-installs-list-that-only-showed-one-answer.md)
