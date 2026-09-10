@@ -207,3 +207,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 218 - The Column That Could Only Mean One Thing](entries/2026-09-10-vhost-config-tables-and-the-column-that-could-only-mean-one-thing.md)
 - [Phase 219 - The Mailbox That Went Dark](entries/2026-09-10-mail-forwarders-and-the-mailbox-that-went-dark.md)
 - [Phase 220 - The State Nobody Ever Entered](entries/2026-09-10-ssl-pill-and-the-state-nobody-ever-entered.md)
+- [Phase 221 - The Table That Only Ever Said One Thing](entries/2026-09-10-domain-selector-polish-and-the-table-that-only-ever-said-one-thing.md)
