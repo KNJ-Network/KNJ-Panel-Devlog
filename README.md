@@ -200,3 +200,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 211 - The Answer Nobody Asked For, Rejecting Itself](entries/2026-09-09-password-confirmation-and-username-login.md)
 - [Phase 212 - The App That Lived at Someone Else's Address](entries/2026-09-09-app-catalog-and-the-app-that-lived-at-someone-elses-address.md)
 - [Phase 213 - The Tool That Would Only Add](entries/2026-09-09-domains-page-and-the-tool-that-would-only-add.md)
+- [Phase 214 - The Address That Worked the First Time](entries/2026-09-10-invoice-ninja-and-the-address-that-worked-the-first-time.md)
