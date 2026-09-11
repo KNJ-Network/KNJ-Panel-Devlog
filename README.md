@@ -231,3 +231,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 221 - The Table That Only Ever Said One Thing](entries/2026-09-10-domain-selector-polish-and-the-table-that-only-ever-said-one-thing.md)
 - [Phase 222 - The Index That Was Secretly Load-Bearing](entries/2026-09-10-the-migration-that-couldnt-drop-its-own-support.md)
 - [Phase 223 - The Installs List That Only Showed One Answer](entries/2026-09-10-the-installs-list-that-only-showed-one-answer.md)
+- [Phase 224 - The Scan That Found Its Own Neighbours](entries/2026-09-11-the-scan-that-found-its-own-neighbours.md)
+- [Phase 225 - The List That Remembered When, Not What](entries/2026-09-11-the-list-that-remembered-when-not-what.md)
