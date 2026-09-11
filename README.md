@@ -235,3 +235,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 225 - The List That Remembered When, Not What](entries/2026-09-11-the-list-that-remembered-when-not-what.md)
 - [Phase 226 - One Order, Everywhere](entries/2026-09-11-one-order-everywhere.md)
 - [Phase 227 - The Report That Couldn't Say Zero](entries/2026-09-11-the-report-that-couldnt-say-zero.md)
+- [Phase 228 - A Name Borrowed From Someone Else's House](entries/2026-09-11-a-name-borrowed-from-someone-elses-house.md)
+- [Phase 229 - What Moving Out Forgot to Take](entries/2026-09-11-what-moving-out-forgot-to-take.md)
