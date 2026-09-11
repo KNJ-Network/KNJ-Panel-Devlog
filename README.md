@@ -244,3 +244,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 234 - The Badge's Quieter Sibling](entries/2026-09-11-the-badges-quieter-sibling.md)
 - [Phase 235 - A Cache With Nobody Left to Fill It](entries/2026-09-11-a-cache-with-nobody-left-to-fill-it.md)
 - [Phase 236 - A Dropdown Standing in the Wrong Doorway](entries/2026-09-11-a-dropdown-standing-in-the-wrong-doorway.md)
+- [Phase 237 - A Guard That Was Only Ever Hired Once](entries/2026-09-11-a-guard-that-was-only-ever-hired-once.md)
