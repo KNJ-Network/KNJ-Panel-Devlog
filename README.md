@@ -233,3 +233,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 223 - The Installs List That Only Showed One Answer](entries/2026-09-10-the-installs-list-that-only-showed-one-answer.md)
 - [Phase 224 - The Scan That Found Its Own Neighbours](entries/2026-09-11-the-scan-that-found-its-own-neighbours.md)
 - [Phase 225 - The List That Remembered When, Not What](entries/2026-09-11-the-list-that-remembered-when-not-what.md)
+- [Phase 226 - One Order, Everywhere](entries/2026-09-11-one-order-everywhere.md)
+- [Phase 227 - The Report That Couldn't Say Zero](entries/2026-09-11-the-report-that-couldnt-say-zero.md)
