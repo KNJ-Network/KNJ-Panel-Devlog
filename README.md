@@ -240,3 +240,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 230 - Database Access, Scoped to the Account](entries/2026-09-11-the-door-that-should-never-have-had-a-master-key.md)
 - [Phase 231 - A Record of the Reader](entries/2026-09-11-a-record-of-the-reader.md)
 - [Phase 232 - One Door for Every Room](entries/2026-09-11-one-door-for-every-room.md)
+- [Phase 233 - The Badge That Did Too Much Work](entries/2026-09-11-the-badge-that-did-too-much-work.md)
