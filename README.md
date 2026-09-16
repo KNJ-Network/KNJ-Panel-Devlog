@@ -247,3 +247,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 237 - A Guard That Was Only Ever Hired Once](entries/2026-09-11-a-guard-that-was-only-ever-hired-once.md)
 - [Phase 238 - A Name Before Anyone Asked for One](entries/2026-09-16-a-name-before-anyone-asked-for-one.md)
 - [Phase 239 - What a Real First Day Actually Looks Like](entries/2026-09-16-what-a-real-first-day-actually-looks-like.md)
+- [Phase 240 - The Reminder That Only Fires Once](entries/2026-09-16-the-reminder-that-only-fires-once.md)
