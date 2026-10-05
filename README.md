@@ -249,3 +249,7 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 239 - What a Real First Day Actually Looks Like](entries/2026-09-16-what-a-real-first-day-actually-looks-like.md)
 - [Phase 240 - The Reminder That Only Fires Once](entries/2026-09-16-the-reminder-that-only-fires-once.md)
 - [Phase 241 - The Address That Needed Two Stories](entries/2026-09-16-the-address-that-needed-two-stories.md)
+- [Phase 242 - The Zone That Had To Exist First](entries/2026-09-16-the-zone-that-had-to-exist-first.md)
+- [Phase 243 - The Broom That Didn't Look First](entries/2026-09-16-the-broom-that-didnt-look-first.md)
+- [Phase 244 - The Fix That Only Fixed Half the Door](entries/2026-10-05-the-fix-that-only-fixed-half-the-door.md)
+- [Phase 245 - The Repair That Measured Wrong Every Time](entries/2026-10-05-the-repair-that-measured-wrong-every-time.md)
