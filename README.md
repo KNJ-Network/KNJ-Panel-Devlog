@@ -232,3 +232,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 243 - The Broom That Didn't Look First](entries/2026-09-16-the-broom-that-didnt-look-first.md)
 - [Phase 244 - The Fix That Only Fixed Half the Door](entries/2026-10-05-the-fix-that-only-fixed-half-the-door.md)
 - [Phase 245 - The Repair That Measured Wrong Every Time](entries/2026-10-05-the-repair-that-measured-wrong-every-time.md)
+- [Phase 246 - The Bug Hiding Behind the Workaround](entries/2026-10-09-the-bug-hiding-behind-the-workaround.md)
+- [Phase 247 - The Backups That Lived on the Wrong Server](entries/2026-10-09-the-backups-that-lived-on-the-wrong-server.md)
