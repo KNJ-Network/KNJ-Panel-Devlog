@@ -59,7 +59,7 @@ feature tests could have caught, since both only exist on the cross-server dispa
 
 **Bug 1 — stale satellites.** `usageForAccount()` came back with `trash_bytes`/`junk_bytes` stuck at
 zero even after fabricating real `.Trash`/`.Junk` maildir content directly on the satellite. Root
-cause: both linked satellites (`mail.dev.knj.network` and the DNS Only box at `62.31.247.87`) were
+cause: both linked satellites (`mail.dev.knj.network` and the DNS Only box) were
 still on v0.16.49 — five releases behind panel-dev — so the satellite was still running the old
 2-field `mail-usage-report` output. This traced back to a process gap: the "apply the update to both
 satellites" step of this session's own deploy routine got dropped for v0.16.50 through v0.16.54, only

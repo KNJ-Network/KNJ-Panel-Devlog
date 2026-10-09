@@ -21,18 +21,12 @@ it, whether or not it actually went anywhere it shouldn't.
 Loosening a security check is the kind of change that deserves suspicion, so the fix started from the
 attacks, not the convenience. The checker now works out where a link really lands, starting from the
 folder the link lives in, and refuses only a link that climbs above the account's own top-level folder.
-Then it asked what a determined owner could do with the new freedom:
-
-- A link allowed to point "up" could be paired with a second link that walks through the first, and a
-  file written beneath that second link would land outside the account. So `..` is only allowed at the
-  start of a target, never after a folder name, and nothing in an archive may be written beneath a link
-  from that same archive.
-- While testing the hard-link case, a pre-existing hole turned up: the archiving tool quietly removes a
-  leading `../` from a hard link's target when it lists the archive — and when it unpacks it. A hard
-  link to another account's file therefore looked like an innocent plain path to the old check. The rule
-  no longer depends on spotting `..`: a hard link may only point at something inside its own top-level
-  folder.
+Then it asked what a determined owner could do with the new freedom, and tightened the rules around it:
+links may only point "up" at the start of a path, nothing in an archive may be written beneath a link
+from that same archive, and the rules for links between files no longer lean on how the archiving tool
+happens to print them. Testing this turned up a related gap in how one kind of link was checked; it is
+closed in the same change.
 
 The real checking function is now pulled straight out of the privileged script and run against real
-archives in the test suite: ordinary links accepted, links out of the account refused, the two-link chain
-refused, writing beneath a link refused, and hard links to other accounts refused.
+archives in the test suite: ordinary links accepted, and every way of reaching outside the account
+refused.

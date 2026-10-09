@@ -42,8 +42,8 @@ Both were found running an actual pull against a real remote box, and neither is
 existing unit/feature test suite — one needed real compiled Blade→HTML output, the other needed an
 actual browser `<textarea>` submission.
 
-**A Blade escape collision.** The sources table rendered `kritchie{{ $source->hostname }}:22` —
-literal, unparsed Blade syntax — instead of `kritchie@62.31.247.86:22`. The three adjacent echoes
+**A Blade escape collision.** The sources table rendered `user{{ $source->hostname }}:22` —
+literal, unparsed Blade syntax — instead of `user@source-host:22`. The three adjacent echoes
 (`{{ $source->ssh_username }}@{{ $source->hostname }}:{{ $source->port }}`) happened to contain the
 exact byte sequence `}}@{{` that Blade's compiler treats as its own literal-`{{ }}` escape
 directive (meant for letting JS frameworks like Vue coexist in the same template). The compiler
