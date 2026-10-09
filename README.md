@@ -234,3 +234,6 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 245 - The Repair That Measured Wrong Every Time](entries/2026-10-05-the-repair-that-measured-wrong-every-time.md)
 - [Phase 246 - The Bug Hiding Behind the Workaround](entries/2026-10-09-the-bug-hiding-behind-the-workaround.md)
 - [Phase 247 - The Backups That Lived on the Wrong Server](entries/2026-10-09-the-backups-that-lived-on-the-wrong-server.md)
+- [Phase 248 - The Folder Name the Script Wouldn't Accept](entries/2026-10-09-the-folder-name-the-script-wouldnt-accept.md)
+- [Phase 249 - One Clock, Not Two](entries/2026-10-09-one-clock-not-two.md)
+- [Phase 250 - The Link That Was Fine](entries/2026-10-09-the-link-that-was-fine.md)
