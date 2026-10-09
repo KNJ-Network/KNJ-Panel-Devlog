@@ -237,3 +237,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 248 - The Folder Name the Script Wouldn't Accept](entries/2026-10-09-the-folder-name-the-script-wouldnt-accept.md)
 - [Phase 249 - One Clock, Not Two](entries/2026-10-09-one-clock-not-two.md)
 - [Phase 250 - The Link That Was Fine](entries/2026-10-09-the-link-that-was-fine.md)
+- [Phase 251 - The Run That Had Already Happened](entries/2026-10-09-the-run-that-had-already-happened.md)
