@@ -259,3 +259,7 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 249 - One Clock, Not Two](entries/2026-10-09-one-clock-not-two.md)
 - [Phase 250 - The Link That Was Fine](entries/2026-10-09-the-link-that-was-fine.md)
 - [Phase 251 - The Run That Had Already Happened](entries/2026-10-09-the-run-that-had-already-happened.md)
+- [Phase 252 - The Link That Trusted the Visitor](entries/2026-10-10-the-link-that-trusted-the-visitor.md)
+- [Phase 253 - The Folder Inside the Customer's Reach](entries/2026-10-10-the-folder-inside-the-customers-reach.md)
+- [Phase 254 - The Server That Was Too Open to Its Own Customers](entries/2026-10-10-the-server-that-was-too-open-to-its-own-customers.md)
+- [Phase 255 - Two Lists, One Click](entries/2026-10-12-two-lists-one-click.md)
