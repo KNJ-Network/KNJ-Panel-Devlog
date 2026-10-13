@@ -265,3 +265,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 255 - Two Lists, One Click](entries/2026-10-12-two-lists-one-click.md)
 - [Phase 256 - The Page That Showed Zeros Politely](entries/2026-10-13-the-page-that-showed-zeros-politely.md)
 - [Phase 257 - The File the Panel Was Not Allowed to Touch](entries/2026-10-13-the-file-the-panel-was-not-allowed-to-touch.md)
+- [Phase 258 - The File Manager That Learned to Forgive](entries/2026-10-13-the-file-manager-that-learned-to-forgive.md)
