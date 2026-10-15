@@ -269,3 +269,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 259 - The Fix That Passed Everywhere but Production](entries/2026-10-13-the-fix-that-passed-everywhere-but-production.md)
 - [Phase 260 - The Queue That Waited for a Backup Server](entries/2026-10-13-the-queue-that-waited-for-a-backup-server.md)
 - [Phase 261 - The Test That Found Nothing to Break](entries/2026-10-14-the-test-that-found-nothing-to-break.md)
+- [Phase 262 - The Docs Site That Deployed Itself](entries/2026-10-15-the-docs-site-that-deployed-itself.md)
+- [Phase 263 - The Tool Nobody Should Be Able to Find](entries/2026-10-15-the-tool-nobody-should-be-able-to-find.md)
