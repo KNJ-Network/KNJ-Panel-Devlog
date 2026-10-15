@@ -272,3 +272,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 262 - The Docs Site That Deployed Itself](entries/2026-10-15-the-docs-site-that-deployed-itself.md)
 - [Phase 263 - The Tool Nobody Should Be Able to Find](entries/2026-10-15-the-tool-nobody-should-be-able-to-find.md)
 - [Phase 264 - The Script the App Could Edit](entries/2026-10-15-the-script-the-app-could-edit.md)
+- [Phase 265 - The Documentation Audit](entries/2026-10-15-the-documentation-audit.md)
