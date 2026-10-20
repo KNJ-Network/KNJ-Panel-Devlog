@@ -27,4 +27,4 @@ details removed. Nothing is sent anywhere until that channel is connected.
 The whole feature was reviewed for the ways a support desk can be misused: one customer reading another's
 tickets, staff on one desk seeing another's, forged or flooded email, and hostile text or files. Each
 route was tried by every kind of person who should not be allowed in, and the problems that turned up
-were fixed. It stays switched off until the next release, which brings it all in one go.
+were fixed. It shipped in 0.21.0, all in one go.

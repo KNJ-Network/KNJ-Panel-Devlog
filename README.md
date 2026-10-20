@@ -274,3 +274,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 264 - The Script the App Could Edit](entries/2026-10-15-the-script-the-app-could-edit.md)
 - [Phase 265 - The Documentation Audit](entries/2026-10-15-the-documentation-audit.md)
 - [Phase 266 - A Support Desk, Built In](entries/2026-10-20-a-support-desk-built-in.md)
+- [Phase 267 - A New Look, and Pages That Stay Put](entries/2026-10-20-a-new-look-and-pages-that-stay-put.md)
