@@ -277,3 +277,5 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 267 - A New Look, and Pages That Stay Put](entries/2026-10-20-a-new-look-and-pages-that-stay-put.md)
 - [Phase 268 - The Sign-Ups That Said Thanks](entries/2026-10-21-the-sign-ups-that-said-thanks.md)
 - [Phase 269 - Mail That Left Unsigned](entries/2026-10-21-mail-that-left-unsigned.md)
+- [Phase 270 - A Page-by-Page Redo](entries/2026-10-22-a-page-by-page-redo.md)
+- [Phase 271 - The Licence Server Grows Up](entries/2026-10-22-the-licence-server-grows-up.md)
