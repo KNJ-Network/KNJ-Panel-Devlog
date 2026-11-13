@@ -279,3 +279,6 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 269 - Mail That Left Unsigned](entries/2026-10-21-mail-that-left-unsigned.md)
 - [Phase 270 - A Page-by-Page Redo](entries/2026-10-22-a-page-by-page-redo.md)
 - [Phase 271 - The Licence Server Grows Up](entries/2026-10-22-the-licence-server-grows-up.md)
+- [Phase 272 - Agreements You Can Read Again](entries/2026-11-11-agreements-you-can-read-again.md)
+- [Phase 273 - A Licence Server That Raises the Alarm](entries/2026-11-11-a-licence-server-that-raises-the-alarm.md)
+- [Phase 274 - The Redo Carries On](entries/2026-11-13-the-redo-carries-on.md)
