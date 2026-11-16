@@ -25,3 +25,12 @@ two records or the record points somewhere else, because guessing there would br
 key or makes one. Fixing DMARC starts with watching and only moves to quarantine once SPF and DKIM both pass, and it never
 goes stricter than that by itself. Every fix goes through the normal zone change, so it appears in the zone's history and
 can be undone, and the buttons are switched off, with the reason, for a domain whose DNS lives somewhere else.
+
+## One more check: the name it gives
+
+Reverse DNS showed "Confirmed" whenever the address and its reverse name agreed with each other. Receiving mail servers
+also compare that name with the one a server announces when it connects to them, and a mismatch costs trust even when the
+reverse DNS itself is fine. The sending-server card now has a row for it. It reads the name the server announces and says
+whether it points at the sending address and matches the reverse DNS. When it does not, the page says which of the two to
+change and who changes it, rather than offering a button, because one is a whole-server setting and the other belongs to
+the provider that owns the address. The health check on the Diagnostics page has the same row.
