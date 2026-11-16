@@ -292,3 +292,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 282 - Nameservers That Reach Every Zone](entries/2026-11-16-nameservers-that-reach-every-zone.md)
 - [Phase 283 - One Page Fewer](entries/2026-11-16-one-page-fewer.md)
 - [Phase 284 - Propagation, Asked Properly](entries/2026-11-16-propagation-asked-properly.md)
+- [Phase 285 - Emails That Look Like Ours](entries/2026-11-16-emails-that-look-like-ours.md)
