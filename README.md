@@ -290,3 +290,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 280 - Cron Jobs for Every Account](entries/2026-11-16-cron-jobs-for-every-account.md)
 - [Phase 281 - DNS Zones With an Undo Button](entries/2026-11-16-dns-zones-with-an-undo-button.md)
 - [Phase 282 - Nameservers That Reach Every Zone](entries/2026-11-16-nameservers-that-reach-every-zone.md)
+- [Phase 283 - One Page Fewer](entries/2026-11-16-one-page-fewer.md)
