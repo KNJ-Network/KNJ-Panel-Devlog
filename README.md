@@ -282,3 +282,7 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 272 - Agreements You Can Read Again](entries/2026-11-11-agreements-you-can-read-again.md)
 - [Phase 273 - A Licence Server That Raises the Alarm](entries/2026-11-11-a-licence-server-that-raises-the-alarm.md)
 - [Phase 274 - The Redo Carries On](entries/2026-11-13-the-redo-carries-on.md)
+- [Phase 275 - The Address That Showed Someone Else's Site](entries/2026-11-13-the-address-that-showed-someone-elses-site.md)
+- [Phase 276 - A Diagnostics Page Worth Opening](entries/2026-11-16-a-diagnostics-page-worth-opening.md)
+- [Phase 277 - Logs That Tell You What Matters](entries/2026-11-16-logs-that-tell-you-what-matters.md)
+- [Phase 278 - Banning the People Who Keep Trying](entries/2026-11-16-banning-the-people-who-keep-trying.md)
