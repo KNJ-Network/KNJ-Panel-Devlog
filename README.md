@@ -286,3 +286,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 276 - A Diagnostics Page Worth Opening](entries/2026-11-16-a-diagnostics-page-worth-opening.md)
 - [Phase 277 - Logs That Tell You What Matters](entries/2026-11-16-logs-that-tell-you-what-matters.md)
 - [Phase 278 - Banning the People Who Keep Trying](entries/2026-11-16-banning-the-people-who-keep-trying.md)
+- [Phase 279 - Scheduled Jobs You Can See](entries/2026-11-16-scheduled-jobs-you-can-see.md)
