@@ -309,3 +309,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 299 - Faster Pages For Every Site](entries/2026-11-18-faster-pages-for-every-site.md)
 - [Phase 300 - Will Any Certificate Run Out Unnoticed](entries/2026-11-18-will-any-certificate-run-out.md)
 - [Phase 301 - Who Can Call The API, And What Have They Done](entries/2026-11-18-who-can-call-the-api.md)
+- [Phase 302 - Is Every Account Backed Up](entries/2026-11-18-is-every-account-backed-up.md)
