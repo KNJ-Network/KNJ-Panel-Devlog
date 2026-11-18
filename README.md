@@ -307,3 +307,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 297 - One Page For Who Gets In](entries/2026-11-17-one-page-for-who-gets-in.md)
 - [Phase 298 - Which Sites The Firewall Protects](entries/2026-11-17-which-sites-the-firewall-protects.md)
 - [Phase 299 - Faster Pages For Every Site](entries/2026-11-18-faster-pages-for-every-site.md)
+- [Phase 300 - Will Any Certificate Run Out Unnoticed](entries/2026-11-18-will-any-certificate-run-out.md)
