@@ -15,3 +15,8 @@ Switching WebDAV off now really does switch it off, and back on restores everyth
 default, taking care that the ordinary first request of every WebDAV program is never counted against anyone. Logins can be read
 only, the size limit is a setting, and the administrator has a list of every login with when it was last used and a way to
 remove one.
+
+WebDAV had also never been tried against a real server, and trying it found more than the page showed. The firewall refused every
+WebDAV request, so the feature could not have worked on any server running it. Files uploaded over it could not be changed by the
+customer's own site, and Mac Finder could not write at all. All three are fixed, and the feature now has a proper end-to-end
+check behind it.
