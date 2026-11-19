@@ -319,3 +319,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 309 - WebDAV Gets A Home](entries/2026-11-19-webdav-gets-a-home.md)
 - [Phase 310 - Where The Logs Go](entries/2026-11-19-where-the-logs-go.md)
 - [Phase 311 - Three Pages, One Brand](entries/2026-11-19-three-pages-one-brand.md)
+- [Phase 312 - Is Every Report Fresh](entries/2026-11-19-is-every-report-fresh.md)
