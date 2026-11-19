@@ -314,3 +314,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 304 - Who Did What](entries/2026-11-19-who-did-what.md)
 - [Phase 305 - Every Server In One Place](entries/2026-11-19-every-server-in-one-place.md)
 - [Phase 306 - Is The Server Coping](entries/2026-11-19-is-the-server-coping.md)
+- [Phase 307 - One Place For PHP](entries/2026-11-19-one-place-for-php.md)
