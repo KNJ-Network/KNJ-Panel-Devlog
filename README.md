@@ -321,3 +321,4 @@ This repo is curated updates only — no source code. The private source repo is
 - [Phase 311 - Three Pages, One Brand](entries/2026-11-19-three-pages-one-brand.md)
 - [Phase 312 - Is Every Report Fresh](entries/2026-11-19-is-every-report-fresh.md)
 - [Phase 313 - The Admin Sees The Server, Not The Data](entries/2026-11-19-the-admin-sees-the-server-not-the-data.md)
+- [Phase 314 - Ask Why Before Opening](entries/2026-11-19-ask-why-before-opening.md)
